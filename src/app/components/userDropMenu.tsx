@@ -15,7 +15,7 @@ const UserDropdownMenu: FC = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="bg-transparent border-none p-0 cursor-pointer">
+        <button className="w-8 h-8 flex items-center justify-center p-0 bg-transparent">
           <img
             className="w-6 h-6 object-contain"
             src="https://cdn-icons-png.flaticon.com/128/456/456212.png"
