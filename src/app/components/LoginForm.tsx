@@ -3,19 +3,18 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
+export default function LoginForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     email: "",
     password: "",
-    role: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -25,7 +24,7 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
     setError("");
     setSuccess("");
     try {
-      const res = await fetch("http://localhost:3000/api/auth/register", {
+      const res = await fetch("http://localhost:3000/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -33,15 +32,13 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
         body: JSON.stringify(form)
       });
       if (!res.ok) {
-        const data = await res.json();
-        setError(data.message || "Error al registrar usuario");
+        const data = await res.text();
+        setError(data || "Error al iniciar sesión");
       } else {
-        setSuccess("¡Registro exitoso!");
-        setForm({ email: "", password: "", role: "" });
+        const data = await res.json();
+        setSuccess("¡Inicio de sesión exitoso!");
+        localStorage.setItem("token", data.token);
         setTimeout(() => {
-          if (onSuccess) {
-            onSuccess();
-          }
           router.push("/dashboard"); // Redirige al dashboard
         }, 1000);
       }
@@ -100,34 +97,20 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
             </button>
           </div>
         </div>
-        <div>
-          <label className="block font-semibold mb-2">Rol</label>
-          <input
-            type="text"
-            name="role"
-            placeholder="Escriba 'cliente' o 'vendedor'"
-            value={form.role}
-            onChange={handleChange}
-            required
-            className="w-full border border-black rounded-xl px-4 py-3 focus:outline-none"
-            pattern="cliente|vendedor"
-            title="Debe ser 'cliente' o 'vendedor'"
-          />
-        </div>
         <button
           type="submit"
           className="w-full bg-green-700 text-white font-semibold py-3 rounded-xl mt-2 hover:bg-green-800 transition"
           disabled={loading}
         >
-          {loading ? "Registrando..." : "Registrarse"}
+          {loading ? "Iniciando sesión..." : "Iniciar sesión"}
         </button>
         {error && <p className="text-red-600 text-center">{error}</p>}
         {success && <p className="text-green-700 text-center">{success}</p>}
         <a
-          href="/login"
+          href="/register"
           className="text-center text-black underline mt-2"
         >
-          ¿Ya tienes cuenta? Inicia sesión
+          ¿No tienes cuenta? Regístrate
         </a>
       </form>
     </div>
