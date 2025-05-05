@@ -25,7 +25,7 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
     setError("");
     setSuccess("");
     try {
-      const res = await fetch("http://localhost:3000/api/auth/register", {
+      const res = await fetch("http://localhost:3001/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -42,7 +42,12 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
           if (onSuccess) {
             onSuccess();
           }
-          router.push("/dashboard"); // Redirige al dashboard
+          // Redirige según el rol
+          if (form.role === "vendedor") {
+            router.push("/pos"); // Redirige a la página de POS
+          } else {
+            router.push("/dashboard"); // Redirige al dashboard
+          }
         }, 1000);
       }
     } catch (err) {

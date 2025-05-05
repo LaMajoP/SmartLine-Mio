@@ -24,7 +24,7 @@ export default function LoginForm() {
     setError("");
     setSuccess("");
     try {
-      const res = await fetch("http://localhost:3000/api/auth/login", {
+      const res = await fetch("http://localhost:3001/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -38,9 +38,18 @@ export default function LoginForm() {
         const data = await res.json();
         setSuccess("¡Inicio de sesión exitoso!");
         localStorage.setItem("token", data.token);
-        setTimeout(() => {
-          router.push("/dashboard"); // Redirige al dashboard
-        }, 1000);
+        // Redirección según el rol
+        if (data.role === "cliente") {
+          setTimeout(() => {
+            router.push("/dashboard");
+          }, 1000);
+        } else if (data.role === "vendedor") { // Cambiado de "trabajador" a "vendedor"
+          setTimeout(() => {
+            router.push("/pos");
+          }, 1000);
+        } else {
+          setError("Rol no reconocido");
+        }
       }
     } catch (err) {
       setError("Error de conexión");
