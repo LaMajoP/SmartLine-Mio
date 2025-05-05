@@ -10,8 +10,16 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
 
 const UserDropdownMenu: FC = () => {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    router.push("/login");
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -51,7 +59,10 @@ const UserDropdownMenu: FC = () => {
             </DropdownMenuShortcut>
           </DropdownMenuItem>
 
-          <DropdownMenuItem className="flex items-center gap-2 text-sm text-black font-medium cursor-pointer">
+          <DropdownMenuItem
+            className="flex items-center gap-2 text-sm text-black font-medium cursor-pointer"
+            onClick={handleLogout}
+          >
             <span>Cerrar Sesión</span>
             <DropdownMenuShortcut>
               <LogOut size={16} className="text-black" />
