@@ -14,7 +14,8 @@ export default function Header() {
     <header className="border-b border-gray-300 bg-white w-full px-8 py-6 shadow-xl">
       <nav className="flex items-center justify-between">
         <div className="flex items-center gap-12 pr-10">
-          <Image src={SmartLine_Logo} alt="SmartLine Logo" width={225} />
+          <Image src={SmartLine_Logo} alt="SmartLine Logo" width={225} className="cursor-pointer" onClick={() => router.push("/")}
+/>
           <NavigationMenuComponent />
           <button
             className="font-semibold cursor-pointer"
