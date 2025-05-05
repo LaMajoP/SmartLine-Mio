@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     email: "",
@@ -36,6 +38,9 @@ export default function RegisterForm() {
       } else {
         setSuccess("¡Registro exitoso!");
         setForm({ email: "", password: "", role: "" });
+        setTimeout(() => {
+          router.push("/"); // Redirige a la página principal después de 1 segundo
+        }, 1000);
       }
     } catch (err) {
       setError("Error de conexión");
