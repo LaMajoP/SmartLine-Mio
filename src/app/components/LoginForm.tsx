@@ -1,5 +1,8 @@
 'use client';
 
+import { Eye, EyeOff } from "lucide-react";
+import SmartLine_Logo from "@/assets/SmartLine_Logo.webp";
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -59,15 +62,11 @@ export default function LoginForm() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-      <img
-        src="/SmartLine_Logo.webp"
-        alt="SmartLine Logo"
-        className="w-24 mb-4"
-      />
-      <h1 className="text-3xl font-bold mb-8">
-        <span className="text-black">Smart</span>
-        <span className="text-green-700">Line</span>
-      </h1>
+     <Image
+             src={SmartLine_Logo}
+             alt="SmartLine Logo"
+             width={305}
+           />
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md flex flex-col gap-6"
@@ -99,10 +98,10 @@ export default function LoginForm() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"
+              className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"
               tabIndex={-1}
             >
-              {showPassword ? "🙈" : "👁️"}
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
         </div>

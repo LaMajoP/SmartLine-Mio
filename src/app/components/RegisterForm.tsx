@@ -1,7 +1,10 @@
 'use client';
-
+import SmartLine_Logo from "@/assets/SmartLine_Logo.webp";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { Eye, EyeOff } from "lucide-react";
+
 
 export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
   const router = useRouter();
@@ -58,15 +61,11 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-      <img
-        src="/SmartLine_Logo.webp"
+      <Image
+        src={SmartLine_Logo}
         alt="SmartLine Logo"
-        className="w-24 mb-4"
+        width={305}
       />
-      <h1 className="text-3xl font-bold mb-8">
-        <span className="text-black">Smart</span>
-        <span className="text-green-700">Line</span>
-      </h1>
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md flex flex-col gap-6"
@@ -98,26 +97,27 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"
-              tabIndex={-1}
+              className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 bg-white"
             >
-              {showPassword ? "🙈" : "👁️"}
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
-          </div>
+          </div>  
         </div>
         <div>
           <label className="block font-semibold mb-2">Rol</label>
-          <input
-            type="text"
+          <select
             name="role"
-            placeholder="Escriba 'cliente' o 'vendedor'"
             value={form.role}
             onChange={handleChange}
             required
-            className="w-full border border-black rounded-xl px-4 py-3 focus:outline-none"
-            pattern="cliente|vendedor"
-            title="Debe ser 'cliente' o 'vendedor'"
-          />
+            className="w-full border border-black rounded-xl px-4 py-3 focus:outline-none bg-white"
+          >
+            <option value="" disabled>
+              Seleccione un rol
+            </option>
+            <option value="cliente">Cliente</option>
+            <option value="vendedor">Vendedor</option>
+          </select>
         </div>
         <button
           type="submit"
