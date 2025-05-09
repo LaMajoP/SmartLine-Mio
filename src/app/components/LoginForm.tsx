@@ -27,7 +27,7 @@ export default function LoginForm() {
     setError("");
     setSuccess("");
     try {
-      const res = await fetch("https://backend-proyecto-final-web.onrender.com/api/auth/login", { //OJALA SIRVA
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
