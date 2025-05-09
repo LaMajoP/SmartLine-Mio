@@ -19,15 +19,9 @@ export default function Header() {
             alt="SmartLine Logo"
             width={225}
             className="cursor-pointer"
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/dashboard")}
           />
           <NavigationMenuComponent />
-          <button
-            className="font-semibold cursor-pointer"
-            onClick={() => router.push("/pos")}
-          >
-            POS
-          </button>
         </div>
 
         <div className="flex items-center border border-gray-300 rounded-full px-6 py-3 w-[40vw] bg-white shadow-lg">
