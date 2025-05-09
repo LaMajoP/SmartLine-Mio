@@ -79,7 +79,7 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
             value={form.email}
             onChange={handleChange}
             required
-            className="w-full border border-black rounded-xl px-4 py-3 focus:outline-none"
+            className="w-full border-2 border-gray-400 rounded-xl px-4 py-3 focus:outline-none"
           />
         </div>
         <div>
@@ -92,7 +92,7 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
               value={form.password}
               onChange={handleChange}
               required
-              className="w-full border border-black rounded-xl px-4 py-3 focus:outline-none"
+            className="w-full border-2 border-gray-400 rounded-xl px-4 py-3 focus:outline-none"
             />
             <button
               type="button"
@@ -110,7 +110,7 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
             value={form.role}
             onChange={handleChange}
             required
-            className="w-full border border-black rounded-xl px-4 py-3 focus:outline-none bg-white"
+            className="w-full border-2 border-gray-400 rounded-xl px-4 py-3 focus:outline-none"
           >
             <option value="" disabled>
               Seleccione un rol

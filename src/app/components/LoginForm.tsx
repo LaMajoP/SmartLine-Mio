@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Eye, EyeOff } from "lucide-react";
 import SmartLine_Logo from "@/assets/SmartLine_Logo.webp";
@@ -27,13 +27,16 @@ export default function LoginForm() {
     setError("");
     setSuccess("");
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(form)
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(form),
+        }
+      );
       if (!res.ok) {
         const data = await res.text();
         setError(data || "Error al iniciar sesión");
@@ -46,7 +49,8 @@ export default function LoginForm() {
           setTimeout(() => {
             router.push("/dashboard");
           }, 1000);
-        } else if (data.role === "vendedor") { // Cambiado de "trabajador" a "vendedor"
+        } else if (data.role === "vendedor") {
+          // Cambiado de "trabajador" a "vendedor"
           setTimeout(() => {
             router.push("/pos");
           }, 1000);
@@ -62,16 +66,12 @@ export default function LoginForm() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-     <Image
-             src={SmartLine_Logo}
-             alt="SmartLine Logo"
-             width={305}
-           />
+      <Image src={SmartLine_Logo} alt="SmartLine Logo" width={305} />
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md flex flex-col gap-6"
       >
-        <div>
+        <div className="w-full">
           <label className="block font-semibold mb-2">Correo</label>
           <input
             type="email"
@@ -80,12 +80,12 @@ export default function LoginForm() {
             value={form.email}
             onChange={handleChange}
             required
-            className="w-full border border-black rounded-xl px-4 py-3 focus:outline-none"
+            className="w-full border-2 border-gray-400 rounded-xl px-4 py-3 focus:outline-none"
           />
         </div>
         <div>
           <label className="block font-semibold mb-2">Contraseña</label>
-          <div className="relative">
+          <div className="relative w-full">
             <input
               type={showPassword ? "text" : "password"}
               name="password"
@@ -93,12 +93,12 @@ export default function LoginForm() {
               value={form.password}
               onChange={handleChange}
               required
-              className="w-full border border-black rounded-xl px-4 py-3 focus:outline-none"
+              className="w-full border-2 border-gray-400 rounded-xl px-4 py-3 focus:outline-none"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"
               tabIndex={-1}
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -114,10 +114,7 @@ export default function LoginForm() {
         </button>
         {error && <p className="text-red-600 text-center">{error}</p>}
         {success && <p className="text-green-700 text-center">{success}</p>}
-        <a
-          href="/register"
-          className="text-center text-black underline mt-2"
-        >
+        <a href="/register" className="text-center text-black underline mt-2">
           ¿No tienes cuenta? Regístrate
         </a>
       </form>
