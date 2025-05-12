@@ -1,11 +1,13 @@
+// pages/Inventario.tsx
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Producto {
-  nombre?: string;
-  precio?: number | string;
-  descripcion?: string;
-  cantidad?: number;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  categoria: string;
+  restaurante: string;
 }
 
 interface Categoria {
@@ -14,511 +16,178 @@ interface Categoria {
 }
 
 interface Restaurante {
-  nombre: string;
+  nombreRestaurante: string;
   categorias: Categoria[];
 }
 
-interface EditingProduct {
-  producto: Producto;
-  categoriaNombre: string;
-}
+export default function Inventario() {
+  const [datos, setDatos] = useState<Restaurante[]>([]);
+  const [busqueda, setBusqueda] = useState("");
+  const [formProducto, setFormProducto] = useState({ nombre: "", descripcion: "", precio: 0, categoria: "", restaurante: "" });
+  const [formCategoria, setFormCategoria] = useState({ nombre: "", restaurante: "" });
+  const [editarCategoria, setEditarCategoria] = useState({ actual: "", nuevo: "", restaurante: "" });
 
-interface DeletingProduct {
-  producto: Producto;
-  categoriaNombre: string;
-}
-
-interface EditingCategory {
-  nombreAnterior: string;
-}
-
-const initialData: Restaurante[] = [
-  {
-    nombre: "Escuela",
-    categorias: [
-      {
-        nombre: "Desayunos",
-        productos: [
-          {
-            nombre: "Huevos al gusto",
-            precio: 6700,
-            descripcion: "Fritos, revueltos, omelettes",
-            cantidad: 0,
-          },
-        ],
-      },
-      {
-        nombre: "Entradas",
-        productos: [
-          {
-            nombre: "Pan",
-            precio: 2000,
-            descripcion: "Pan",
-            cantidad: 0,
-          },
-          {
-            nombre: "Tostadas",
-            precio: 3000,
-            descripcion: "Tostadas con mantequilla",
-            cantidad: 0,
-          },
-          {
-            nombre: "Café",
-            precio: 2500,
-            descripcion: "Café espresso",
-            cantidad: 0,
-          },
-        ],
-      },
-    ],
-  },
-];
-
-export default function POSPage() {
-  const [restaurants, setRestaurants] = useState<Restaurante[]>(initialData);
-  const [editingProduct, setEditingProduct] = useState<EditingProduct | null>(
-    null
-  );
-  const [deletingProduct, setDeletingProduct] =
-    useState<DeletingProduct | null>(null);
-  const [editingCategory, setEditingCategory] =
-    useState<EditingCategory | null>(null);
-  const [form, setForm] = useState<Producto>({
-    nombre: "",
-    precio: "",
-    descripcion: "",
-  });
-  const [categoryForm, setCategoryForm] = useState<string>("");
-  const [categoryEditForm, setCategoryEditForm] = useState<string>("");
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [addingProduct, setAddingProduct] = useState<boolean>(false);
-  const [addingCategory, setAddingCategory] = useState<boolean>(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-
-  const openEditModal = (producto: Producto, categoriaNombre: string) => {
-    setEditingProduct({ producto, categoriaNombre });
-    setForm(producto);
+  const fetchData = async () => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/inventario-completo`);
+    const data = await res.json();
+    console.log("✅ Datos cargados:", data); // Debug log útil
+    setDatos(data);
   };
 
-  const openEditCategoryModal = (nombreAnterior: string) => {
-    setEditingCategory({ nombreAnterior });
-    setCategoryEditForm(nombreAnterior);
-  };
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const deleteCategory = (nombreCategoria: string) => {
-    const updated = [...restaurants];
-    updated[0].categorias = updated[0].categorias.filter(
-      (cat) => cat.nombre !== nombreCategoria
-    );
-    setRestaurants(updated);
-  };
+  const filtrarProductos = (productos: Producto[]) =>
+    productos.filter((p) => p.nombre.toLowerCase().includes(busqueda.toLowerCase()));
 
-  const saveCategoryChanges = () => {
-    const updated = [...restaurants];
-    updated[0].categorias = updated[0].categorias.map((cat) =>
-      cat.nombre === editingCategory?.nombreAnterior
-        ? { ...cat, nombre: categoryEditForm }
-        : cat
-    );
-    setRestaurants(updated);
-    setEditingCategory(null);
-  };
-
-  const saveChanges = () => {
-    const updated = [...restaurants];
-    updated[0].categorias = updated[0].categorias.map((cat) => {
-      if (cat.nombre === editingProduct?.categoriaNombre) {
-        cat.productos = cat.productos.map((p) =>
-          p.nombre === editingProduct?.producto.nombre ? form : p
-        );
-      }
-      return cat;
+  const agregarProducto = async () => {
+    await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/producto`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formProducto),
     });
-    setRestaurants(updated);
-    setEditingProduct(null);
+    setFormProducto({ nombre: "", descripcion: "", precio: 0, categoria: "", restaurante: "" });
+    fetchData();
   };
 
-  const confirmDelete = () => {
-    const updated = [...restaurants];
-    updated[0].categorias = updated[0].categorias.map((cat) => {
-      if (cat.nombre === deletingProduct?.categoriaNombre) {
-        cat.productos = cat.productos.filter(
-          (p) => p.nombre !== deletingProduct?.producto.nombre
-        );
-      }
-      return cat;
+  const editarProducto = async () => {
+    await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/producto/${formProducto.nombre}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nombreRestaurante: formProducto.restaurante,
+        nombreCategoria: formProducto.categoria,
+        datosActualizados: {
+          nombre: formProducto.nombre,
+          descripcion: formProducto.descripcion,
+          precio: formProducto.precio,
+        },
+      }),
     });
-    setRestaurants(updated);
-    setDeletingProduct(null);
+    fetchData();
   };
 
-  const openAddProductModal = () => {
-    setAddingProduct(true);
-    setForm({ nombre: "", precio: "", descripcion: "" });
-    setSelectedCategory("");
-  };
-
-  const openAddCategoryModal = () => {
-    setAddingCategory(true);
-    setCategoryForm("");
-  };
-
-  const addProduct = () => {
-    if (!selectedCategory) {
-      alert("Por favor, selecciona una categoría.");
-      return;
-    }
-
-    const updated = [...restaurants];
-    updated[0].categorias = updated[0].categorias.map((cat) => {
-      if (cat.nombre === selectedCategory) {
-        cat.productos.push(form);
-      }
-      return cat;
+  const eliminarProducto = async (rest: string, cat: string, nombre: string) => {
+    await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/producto/${nombre}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombreRestaurante: rest, nombreCategoria: cat }),
     });
-
-    setRestaurants(updated);
-    setAddingProduct(false);
-    setForm({ nombre: "", precio: "", descripcion: "" });
-    setSelectedCategory("");
+    fetchData();
   };
 
-  const addCategory = () => {
-    if (!categoryForm.trim()) {
-      alert("Por favor, ingresa un nombre para la categoría.");
-      return;
-    }
+  const agregarCategoria = async () => {
+    await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/categoria`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombreRestaurante: formCategoria.restaurante, nuevaCategoria: { nombre: formCategoria.nombre } }),
+    });
+    fetchData();
+  };
 
-    const updated = [...restaurants];
-    updated[0].categorias.push({ nombre: categoryForm, productos: [] });
-    setRestaurants(updated);
-    setAddingCategory(false);
-    setCategoryForm("");
+  const editarNombreCategoria = async () => {
+    await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/categoria/${editarCategoria.actual}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombreRestaurante: editarCategoria.restaurante }),
+    });
+    await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/categoria`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombreRestaurante: editarCategoria.restaurante, nuevaCategoria: { nombre: editarCategoria.nuevo } }),
+    });
+    fetchData();
   };
 
   return (
-    <>
-      <main className="p-8">
-        <div className="mb-6">
-          <span className="font-semibold text-3xl">Inventario</span>
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Buscar producto..."
-            className="w-full p-2 border border-gray-300 rounded-md shadow-sm mt-5"
-          />
-        </div>
+    <div className="p-6 space-y-6">
+      <h1 className="text-3xl font-bold">Inventario</h1>
 
-        <div className="mb-6 flex gap-5">
-          <button
-            onClick={openAddProductModal}
-            className="px-4 py-2 bg-green-700 text-white rounded-md hover:bg-green-800"
-          >
-            Añadir Producto
-          </button>
-          <button
-            onClick={openAddCategoryModal}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Añadir Categoría
-          </button>
-        </div>
+      <input
+        placeholder="Buscar producto..."
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+        className="w-full p-2 border rounded"
+      />
 
-        {restaurants.map((restaurante) => (
-          <div key={restaurante.nombre}>
-            <h1 className="text-3xl font-bold mb-6 text-gray-800">
-              {restaurante.nombre}
-            </h1>
-
-            {restaurante.categorias.map((categoria) => (
-              <div key={categoria.nombre} className="mb-12">
-                <div className="flex justify-between items-center mb-2">
-                  <h2 className="text-2xl font-semibold text-blue-600">
-                    {categoria.nombre}
-                  </h2>
-                  <div className="flex gap-2">
-                    <button
-                      className="px-3 py-1 bg-yellow-500 text-white rounded-md text-sm hover:bg-yellow-600"
-                      onClick={() => openEditCategoryModal(categoria.nombre)}
-                    >
-                      Editar
-                    </button>
-                    {categoria.productos.length === 0 && (
-                      <button
-                        className="px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700"
-                        onClick={() => deleteCategory(categoria.nombre)}
-                      >
-                        Eliminar
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                <div className="overflow-x-auto rounded-lg shadow">
-                  <table className="min-w-full bg-white text-sm text-gray-700">
-                    <thead className="bg-gray-100 text-xs uppercase text-gray-500">
-                      <tr>
-                        <th className="px-6 py-3 text-left">Producto</th>
-                        <th className="px-6 py-3 text-left">Descripción</th>
-                        <th className="px-6 py-3 text-right">Precio</th>
-                        <th className="px-6 py-3 text-center">Acciones</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {categoria.productos
-                        .filter((p) =>
-                          (p.nombre?.toLowerCase() || "").includes(
-                            searchTerm.toLowerCase()
-                          )
-                        )
-                        .map((producto) => (
-                          <tr
-                            key={producto.nombre || Math.random()} // Agregado fallback para key en caso de que nombre sea undefined
-                            className="border-b hover:bg-gray-50"
-                          >
-                            <td className="px-6 py-4">
-                              {producto.nombre || "Sin nombre"}
-                            </td>{" "}
-                            {/* Valor predeterminado si nombre es undefined */}
-                            <td className="px-6 py-4">
-                              {producto.descripcion}
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              $
-                              {typeof producto.precio === "number"
-                                ? producto.precio.toLocaleString()
-                                : ""}
-                            </td>
-                            <td className="px-6 py-4 text-center">
-                              <div className="flex justify-center gap-2">
-                                <button
-                                  onClick={() =>
-                                    openEditModal(producto, categoria.nombre)
-                                  }
-                                  className="px-3 py-1 bg-yellow-500 text-white rounded-md text-xs hover:bg-yellow-600"
-                                >
-                                  Modificar
-                                </button>
-                                <button
-                                  onClick={() =>
-                                    setDeletingProduct({
-                                      producto,
-                                      categoriaNombre: categoria.nombre,
-                                    })
-                                  }
-                                  className="px-3 py-1 bg-red-500 text-white rounded-md text-xs hover:bg-red-700"
-                                >
-                                  Eliminar
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  </table>
-                </div>
+      <div className="space-y-4">
+        {datos.map((r) => (
+          <div key={r.nombreRestaurante}>
+            <h2 className="text-xl font-bold text-blue-700">{r.nombreRestaurante}</h2>
+            {r.categorias.map((c) => (
+              <div key={c.nombre} className="border p-4 rounded shadow mb-3">
+                <h3 className="font-semibold text-lg mb-2">{c.nombre || '(Sin nombre)'}</h3>
+                <ul className="space-y-1">
+                  {filtrarProductos(c.productos).map((p) => (
+                    <li key={p.nombre} className="flex justify-between">
+                      <span>{p.nombre} - ${p.precio} - {p.descripcion}</span>
+                      <div className="space-x-2">
+                        <button
+                          onClick={() => setFormProducto({ ...p, categoria: c.nombre, restaurante: r.nombreRestaurante })}
+                          className="text-yellow-600 hover:underline"
+                        >Editar</button>
+                        <button
+                          onClick={() => eliminarProducto(r.nombreRestaurante, c.nombre, p.nombre)}
+                          className="text-red-600 hover:underline"
+                        >Eliminar</button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
         ))}
-      </main>
-
-      {/* Modales (agregar, editar, eliminar producto/categoría) */}
-      {addingCategory && (
-        <Modal
-          title="Añadir categoría"
-          value={categoryForm}
-          onChange={(v) => setCategoryForm(v)}
-          onCancel={() => setAddingCategory(false)}
-          onSave={addCategory}
-        />
-      )}
-
-      {addingProduct && (
-        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Añadir producto</h3>
-
-            <input
-              className="w-full mb-3 border px-3 py-2 rounded"
-              placeholder="Nombre"
-              value={form.nombre}
-              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-            />
-            <input
-              className="w-full mb-3 border px-3 py-2 rounded"
-              placeholder="Descripción"
-              value={form.descripcion}
-              onChange={(e) =>
-                setForm({ ...form, descripcion: e.target.value })
-              }
-            />
-            <input
-              className="w-full mb-3 border px-3 py-2 rounded"
-              type="number"
-              placeholder="Precio"
-              value={form.precio}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  precio: e.target.value ? Number(e.target.value) : "",
-                })
-              }
-            />
-            <select
-              className="w-full mb-3 border px-3 py-2 rounded"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-            >
-              <option value="">Seleccionar categoría</option>
-              {restaurants[0].categorias.map((c) => (
-                <option key={c.nombre} value={c.nombre}>
-                  {c.nombre}
-                </option>
-              ))}
-            </select>
-
-            <ModalActions
-              onCancel={() => setAddingProduct(false)}
-              onSave={addProduct}
-            />
-          </div>
-        </div>
-      )}
-
-      {editingProduct && (
-        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Editar producto</h3>
-            <input
-              className="w-full mb-3 border px-3 py-2 rounded"
-              value={form.nombre}
-              onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-              placeholder="Nombre"
-            />
-            <input
-              className="w-full mb-3 border px-3 py-2 rounded"
-              value={form.descripcion}
-              onChange={(e) =>
-                setForm({ ...form, descripcion: e.target.value })
-              }
-              placeholder="Descripción"
-            />
-            <input
-              className="w-full mb-3 border px-3 py-2 rounded"
-              value={form.precio}
-              type="number"
-              onChange={(e) =>
-                setForm({ ...form, precio: Number(e.target.value) })
-              }
-              placeholder="Precio"
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 cursor-pointer"
-                onClick={() => setEditingProduct(null)}
-              >
-                Cancelar
-              </button>
-              <button
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer"
-                onClick={saveChanges}
-              >
-                Guardar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {editingCategory && (
-        <Modal
-          title="Editar nombre de categoría"
-          value={categoryEditForm}
-          onChange={(v) => setCategoryEditForm(v)}
-          onCancel={() => setEditingCategory(null)}
-          onSave={saveCategoryChanges}
-        />
-      )}
-
-      {deletingProduct && (
-        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm">
-            <h3 className="text-lg font-semibold mb-4 text-center">
-              ¿Estás seguro de eliminar <br />"{deletingProduct.producto.nombre}
-              "?
-            </h3>
-            <div className="flex justify-end gap-2">
-              <button
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 cursor-pointer"
-                onClick={() => setDeletingProduct(null)}
-              >
-                Cancelar
-              </button>
-              <button
-                className="cursor-pointer px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                onClick={confirmDelete}
-              >
-                Eliminar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
-
-function Modal({
-  title,
-  value,
-  onChange,
-  onCancel,
-  onSave,
-}: {
-  title: string;
-  value: string;
-  onChange: (v: string) => void;
-  onCancel: () => void;
-  onSave: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-        <h3 className="text-lg font-semibold mb-4">{title}</h3>
-        <input
-          className="w-full mb-3 border px-3 py-2 rounded"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-        />
-        <ModalActions onCancel={onCancel} onSave={onSave} />
       </div>
-    </div>
-  );
-}
 
-function ModalActions({
-  onCancel,
-  onSave,
-}: {
-  onCancel: () => void;
-  onSave: () => void;
-}) {
-  return (
-    <div className="flex justify-end gap-2">
-      <button
-        className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-        onClick={onCancel}
-      >
-        Cancelar
-      </button>
-      <button
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        onClick={onSave}
-      >
-        Guardar
-      </button>
+      <div className="border p-4 rounded shadow">
+        <h2 className="font-semibold">Agregar/Editar Producto</h2>
+        <select value={formProducto.restaurante} onChange={(e) => setFormProducto({ ...formProducto, restaurante: e.target.value.trim() })} className="block mb-2 w-full border p-1">
+          <option value="">Selecciona restaurante</option>
+          {datos.map((r) => (
+            <option key={r.nombreRestaurante} value={r.nombreRestaurante}>{r.nombreRestaurante}</option>
+          ))}
+        </select>
+
+        <select value={formProducto.categoria} onChange={(e) => setFormProducto({ ...formProducto, categoria: e.target.value })} className="block mb-2 w-full border p-1">
+          <option value="">Selecciona categoría</option>
+          {(datos.find((r) => r.nombreRestaurante === formProducto.restaurante)?.categorias || []).map((c) => (
+            <option key={c.nombre} value={c.nombre}>{c.nombre || '(Sin nombre)'}</option>
+          ))}
+        </select>
+
+        <input placeholder="Nombre" value={formProducto.nombre} onChange={(e) => setFormProducto({ ...formProducto, nombre: e.target.value })} className="block mb-2 w-full border p-1" />
+        <input placeholder="Descripción" value={formProducto.descripcion} onChange={(e) => setFormProducto({ ...formProducto, descripcion: e.target.value })} className="block mb-2 w-full border p-1" />
+        <input type="number" placeholder="Precio" value={formProducto.precio} onChange={(e) => setFormProducto({ ...formProducto, precio: Number(e.target.value) })} className="block mb-2 w-full border p-1" />
+        <button onClick={agregarProducto} className="bg-green-600 text-white px-4 py-2 rounded mr-2">Añadir</button>
+        <button onClick={editarProducto} className="bg-yellow-500 text-white px-4 py-2 rounded">Guardar Cambios</button>
+      </div>
+
+      <div className="border p-4 rounded shadow">
+        <h2 className="font-semibold">Agregar Categoría</h2>
+        <select value={formCategoria.restaurante} onChange={(e) => setFormCategoria({ ...formCategoria, restaurante: e.target.value })} className="block mb-2 w-full border p-1">
+          <option value="">Selecciona restaurante</option>
+          {datos.map((r) => (
+            <option key={r.nombreRestaurante} value={r.nombreRestaurante}>{r.nombreRestaurante}</option>
+          ))}
+        </select>
+        <input placeholder="Nombre de Categoría" value={formCategoria.nombre} onChange={(e) => setFormCategoria({ ...formCategoria, nombre: e.target.value })} className="block mb-2 w-full border p-1" />
+        <button onClick={agregarCategoria} className="bg-blue-600 text-white px-4 py-2 rounded">Crear Categoría</button>
+      </div>
+
+      <div className="border p-4 rounded shadow">
+        <h2 className="font-semibold">Editar nombre de Categoría</h2>
+        <select value={editarCategoria.restaurante} onChange={(e) => setEditarCategoria({ ...editarCategoria, restaurante: e.target.value })} className="block mb-2 w-full border p-1">
+          <option value="">Selecciona restaurante</option>
+          {datos.map((r) => (
+            <option key={r.nombreRestaurante} value={r.nombreRestaurante}>{r.nombreRestaurante}</option>
+          ))}
+        </select>
+        <input placeholder="Nombre Actual" value={editarCategoria.actual} onChange={(e) => setEditarCategoria({ ...editarCategoria, actual: e.target.value })} className="block mb-2 w-full border p-1" />
+        <input placeholder="Nuevo Nombre" value={editarCategoria.nuevo} onChange={(e) => setEditarCategoria({ ...editarCategoria, nuevo: e.target.value })} className="block mb-2 w-full border p-1" />
+        <button onClick={editarNombreCategoria} className="bg-purple-600 text-white px-4 py-2 rounded">Renombrar Categoría</button>
+      </div>
     </div>
   );
 }
