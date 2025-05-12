@@ -8,6 +8,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { navigationMenu } from "@/app/data/data";
+import Link from "next/link";
 
 const NavigationMenuComponent: FC = () => {
   return (
@@ -69,6 +70,11 @@ const NavigationMenuComponent: FC = () => {
           );
         })}
       </NavigationMenuList>
+      <Link href="/products">
+        <button className="px-16 rounded-sm font-semibold text-[85%] cursor-pointer">
+          Productos
+        </button>
+      </Link>
     </NavigationMenu>
   );
 };
