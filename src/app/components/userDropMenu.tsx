@@ -48,17 +48,6 @@ const UserDropdownMenu: FC = () => {
         <DropdownMenuSeparator />
 
         <DropdownMenuGroup>
-          <DropdownMenuItem className="flex items-center gap-2 text-sm text-black font-medium cursor-pointer">
-            <span>Configuración</span>
-            <DropdownMenuShortcut>
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/3524/3524659.png"
-                alt="settings-icon"
-                className="w-4 h-4"
-              />
-            </DropdownMenuShortcut>
-          </DropdownMenuItem>
-
           <DropdownMenuItem
             className="flex items-center gap-2 text-sm text-black font-medium cursor-pointer"
             onClick={handleLogout}

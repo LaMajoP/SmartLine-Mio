@@ -1,9 +1,26 @@
 "use client";
-import { useState } from "react";
-import { menuData as initialMenuData } from "@/app/data/menu"; // Importa el arreglo menuData
+import { useEffect, useState } from "react";
+
+interface Producto {
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  categoria: string;
+  restaurante: string;
+}
+
+interface Categoria {
+  nombre: string;
+  productos: Producto[];
+}
+
+interface Restaurante {
+  nombreRestaurante: string;
+  categorias: Categoria[];
+}
 
 export default function Inventario() {
-  const [menuData, setMenuData] = useState(initialMenuData); // Maneja menuData como estado
+  const [datos, setDatos] = useState<Restaurante[]>([]);
   const [busqueda, setBusqueda] = useState("");
   const [formProducto, setFormProducto] = useState({
     nombre: "",
@@ -288,72 +305,6 @@ export default function Inventario() {
         />
       </div>
 
-      {/* Formulario para agregar categorías */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-bold">Agregar Categoría</h2>
-        <input
-          placeholder="Nombre de la categoría"
-          value={formCategoria.nombre}
-          onChange={(e) => setFormCategoria({ ...formCategoria, nombre: e.target.value })}
-          className="block mb-2 w-full border p-2 rounded"
-        />
-        <input
-          placeholder="Restaurante"
-          value={formCategoria.restaurante}
-          onChange={(e) => setFormCategoria({ ...formCategoria, restaurante: e.target.value })}
-          className="block mb-2 w-full border p-2 rounded"
-        />
-        <button
-          onClick={manejarAgregarCategoria}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          Agregar Categoría
-        </button>
-      </div>
-
-      {/* Formulario para agregar productos */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-bold">Agregar Producto</h2>
-        <input
-          placeholder="Nombre del producto"
-          value={formProducto.nombre}
-          onChange={(e) => setFormProducto({ ...formProducto, nombre: e.target.value })}
-          className="block mb-2 w-full border p-2 rounded"
-        />
-        <input
-          placeholder="Descripción"
-          value={formProducto.descripcion}
-          onChange={(e) => setFormProducto({ ...formProducto, descripcion: e.target.value })}
-          className="block mb-2 w-full border p-2 rounded"
-        />
-        <input
-          type="number"
-          placeholder="Precio"
-          value={formProducto.precio}
-          onChange={(e) => setFormProducto({ ...formProducto, precio: Number(e.target.value) })}
-          className="block mb-2 w-full border p-2 rounded"
-        />
-        <input
-          placeholder="Categoría"
-          value={formProducto.categoria}
-          onChange={(e) => setFormProducto({ ...formProducto, categoria: e.target.value })}
-          className="block mb-2 w-full border p-2 rounded"
-        />
-        <input
-          placeholder="Restaurante"
-          value={formProducto.restaurante}
-          onChange={(e) => setFormProducto({ ...formProducto, restaurante: e.target.value })}
-          className="block mb-2 w-full border p-2 rounded"
-        />
-        <button
-          onClick={manejarAgregarProducto}
-          className="bg-green-500 text-white px-4 py-2 rounded"
-        >
-          Agregar Producto
-        </button>
-      </div>
-
-      {/* Listado de restaurantes y categorías */}
       <div className="space-y-4">
         {datos.map((r) => (
           <div key={r.nombreRestaurante} className="bg-white p-4 rounded shadow">
