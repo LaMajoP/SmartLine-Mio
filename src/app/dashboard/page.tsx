@@ -36,13 +36,13 @@ export default function Home() {
                   rank: "3",
                 },
               ].map(({ img, title, price, rank }) => (
-                <div key={rank} className="text-center text-sm ">
+                <div key={rank} className="text-center text-sm">
                   <img
                     src={img}
                     alt={title}
                     className="w-20 h-20 object-cover rounded-lg mx-auto mb-2"
                   />
-                  <p className="font-medium text-gray-700">{title}</p>
+                  <p className="font-medium text-gray-700 hover:underline cursor-pointer">{title}</p>
                   <p className="text-gray-500">{price}</p>
                   <p className="text-2xl font-bold text-blue-600">{rank}</p>
                 </div>
@@ -50,30 +50,31 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Categorías populares */}
-          <section className="bg-white p-6 rounded-2xl shadow-xl">
+          {/* Califica Servicio */}
+          <section className=" p-6 rounded-xl shadow-2xl bg-white h-fit">
             <h2 className="font-semibold text-2xl mb-6 text-gray-800">
-              ☆ Categorías populares
+              ☆ Califica Nuestro Servicio
             </h2>
-            <div className="pt-10 grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
-              {[
-                "Comida Rápida",
-                "Cafeterías",
-                "Menú del día",
-                "Platos a la carta",
-              ].map((cat) => (
-                <button
-                  key={cat}
-                  className="bg-blue-50 text-blue-700 font-medium px-6 py-3 rounded-lg hover:bg-blue-100 border border-blue-200 transition-all duration-300 text-center w-full cursor-pointer"
-                >
-                  {cat}
-                </button>
-              ))}
+            <div className="pt-5">
+              <div className="flex justify-center gap-2 text-yellow-400 text-3xl mb-3">
+                {[1, 2, 3, 4, 5].map((_, i) => (
+                  <span key={i}>★</span>
+                ))}
+              </div>
+              <textarea
+                className="w-full p-4 rounded-md border border-gray-300 mb-6 text-sm"
+                placeholder="Agrega una sugerencia que tengas para nosotros"
+              />
+
+              <p className="text-center text-sm text-gray-600">
+                ¿Qué tal estuvo tu última compra?
+              </p>
             </div>
           </section>
 
+
           {/* Historial de Compras */}
-          <section className="bg-white p-6 rounded-2xl shadow-xl">
+          <section className="bg-white p-6 rounded-2xl shadow-xl col-span-2">
             <h2 className="font-semibold text-2xl mb-6 text-gray-800">
               ← Historial de Compras
             </h2>
@@ -122,27 +123,7 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Califica Servicio */}
-          <section className=" p-6 rounded-xl shadow-2xl bg-white h-fit">
-            <h2 className="font-semibold text-2xl mb-6 text-gray-800">
-              ☆ Califica Nuestro Servicio
-            </h2>
-            <div className="pt-5">
-              <div className="flex justify-center gap-2 text-yellow-400 text-3xl mb-3">
-                {[1, 2, 3, 4, 5].map((_, i) => (
-                  <span key={i}>★</span>
-                ))}
-              </div>
-              <textarea
-                className="w-full p-4 rounded-md border border-gray-300 mb-6 text-sm"
-                placeholder="Agrega una sugerencia que tengas para nosotros"
-              />
-
-              <p className="text-center text-sm text-gray-600">
-                ¿Qué tal estuvo tu última compra?
-              </p>
-            </div>
-          </section>
+          
         </div>
 
         {/* Columna derecha con la imagen, ahora ocupa el 40% del espacio */}

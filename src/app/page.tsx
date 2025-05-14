@@ -63,28 +63,6 @@ export default function Home() {
                 </div>
               </section>
   
-              {/* Categorías populares */}
-              <section className="bg-white p-6 rounded-2xl shadow-xl">
-                <h2 className="font-semibold text-2xl mb-6 text-gray-800">
-                  ☆ Categorías populares
-                </h2>
-                <div className="pt-10 grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
-                  {[
-                    "Comida Rápida",
-                    "Cafeterías",
-                    "Menú del día",
-                    "Platos a la carta",
-                  ].map((cat) => (
-                    <button
-                      key={cat}
-                      className="bg-blue-50 text-blue-700 font-medium px-6 py-3 rounded-lg hover:bg-blue-100 border border-blue-200 transition-all duration-300 text-center w-full cursor-pointer"
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-              </section>
-  
               {/* Historial de Compras */}
               <section className="bg-white p-6 rounded-2xl shadow-xl">
                 <h2 className="font-semibold text-2xl mb-6 text-gray-800">

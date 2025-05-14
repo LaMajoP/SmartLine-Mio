@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Header from "../components/header";
-import { menuData } from "../data/menu";
 import { useCart } from "@/context/CartContext";
 import { FaSearch } from "react-icons/fa";
 import { useSearchParams } from "next/navigation";
@@ -11,21 +10,57 @@ type Producto = {
   nombre: string;
   precio: number;
   descripcion: string;
+  categoria: string;
+  restaurante: string;
 };
 
+type Categoria = {
+  nombre: string;
+  productos: Producto[];
+};
+
+type Restaurante = {
+  nombreRestaurante: string;
+  categorias: Categoria[];
+};
 
 const MenuPage: React.FC = () => {
   const { addItem } = useCart();
   const [confirmation, setConfirmation] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState<string>(searchParams.get("search") || "");
+  const [datos, setDatos] = useState<Restaurante[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch data from backend
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/inventario-completo`);
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}: ${res.statusText}`);
+      }
+      const data = await res.json();
+      setDatos(data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al cargar datos");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Filtrar restaurantes, categorías y productos basados en el searchQuery
-  const filteredRestaurants = menuData
+  const filteredRestaurants = datos
     .map((restaurante) => {
       const filteredCategorias = restaurante.categorias
         .map((categoria) => {
-          // Filtrar productos válidos y luego por búsqueda
           const filteredProductos = categoria.productos
             .filter(
               (producto) =>
@@ -49,7 +84,7 @@ const MenuPage: React.FC = () => {
         .filter((categoria) => categoria !== null);
 
       if (
-        restaurante.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        restaurante.nombreRestaurante.toLowerCase().includes(searchQuery.toLowerCase()) ||
         filteredCategorias.length > 0
       ) {
         return {
@@ -59,7 +94,7 @@ const MenuPage: React.FC = () => {
       }
       return null;
     })
-    .filter((restaurante) => restaurante !== null); // Eliminar restaurantes nulos
+    .filter((restaurante) => restaurante !== null);
 
   // Maneja la acción de añadir al carrito
   const handleAddItem = (producto: Producto) => {
@@ -69,7 +104,6 @@ const MenuPage: React.FC = () => {
   };
 
   useEffect(() => {
-    // Limpiar el mensaje de confirmación después de un tiempo
     if (confirmation) {
       const timer = setTimeout(() => setConfirmation(null), 2000);
       return () => clearTimeout(timer);
@@ -92,22 +126,30 @@ const MenuPage: React.FC = () => {
           />
         </div>
 
-        {filteredRestaurants.length === 0 && (
+        {isLoading && (
+          <div className="text-center text-lg text-gray-500 py-10">Cargando productos...</div>
+        )}
+
+        {error && (
+          <div className="text-center text-red-600 py-4">{error}</div>
+        )}
+
+        {!isLoading && filteredRestaurants.length === 0 && (
           <p className="text-lg text-gray-500">No se encontraron resultados.</p>
         )}
 
         {filteredRestaurants.map((restaurante) => (
           <div
-            key={restaurante.nombre}
+            key={restaurante.nombreRestaurante}
             className="mb-10 p-6 bg-white rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300"
           >
             <h2 className="text-3xl font-extrabold text-gray-800 mb-6">
-              {restaurante.nombre}
+              {restaurante.nombreRestaurante}
             </h2>
 
             {/* Mapeando las categorías y productos */}
             {restaurante.categorias.map((categoria, categoriaIndex) => (
-              <div key={`${restaurante.nombre}-${categoria.nombre}-${categoriaIndex}`} className="mt-6">
+              <div key={`${restaurante.nombreRestaurante}-${categoria.nombre}-${categoriaIndex}`} className="mt-6">
                 <h3 className="text-2xl font-semibold text-blue-600 mb-4">
                   {categoria.nombre}
                 </h3>
