@@ -93,12 +93,12 @@ export default function Inventario() {
       });
 
       const data = await res.json();
-      
+
       if (!res.ok) {
         throw new Error(data.error || 'Error al crear producto');
       }
 
-      setFormProducto({ nombre: "", descripcion: "", precio: 0, categoria: "", restaurante: "", stock:0});
+      setFormProducto({ nombre: "", descripcion: "", precio: 0, categoria: "", restaurante: "", stock: 0 });
       await fetchData();
       setError(null);
     } catch (err) {
@@ -112,7 +112,7 @@ export default function Inventario() {
   const guardarEdicionProducto = async () => {
     if (!editandoProducto) return;
     setIsLoading(true);
-  
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/producto/${encodeURIComponent(editandoProducto.nombre)}`, {
         method: "PUT",
@@ -128,21 +128,21 @@ export default function Inventario() {
           },
         }),
       });
-  
+
       const contentType = res.headers.get("content-type");
       let data;
-      
+
       if (contentType?.includes("application/json")) {
         data = await res.json();
       } else {
         const text = await res.text();
         throw new Error(text);
       }
-  
+
       if (!res.ok) {
         throw new Error(data.error || "Error al actualizar producto");
       }
-  
+
       setEditandoProducto(null);
       await fetchData();
       setError(null);
@@ -157,19 +157,19 @@ export default function Inventario() {
   const eliminarProducto = async (rest: string, cat: string, nombre: string) => {
     if (!window.confirm(`¿Eliminar el producto ${nombre}?`)) return;
     setIsLoading(true);
-    
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/producto/${encodeURIComponent(nombre)}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          nombreRestaurante: rest, 
-          nombreCategoria: cat 
+        body: JSON.stringify({
+          nombreRestaurante: rest,
+          nombreCategoria: cat
         }),
       });
 
       const data = await res.json();
-      
+
       if (!res.ok) {
         throw new Error(data.error || 'Error al eliminar producto');
       }
@@ -194,14 +194,14 @@ export default function Inventario() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/categoria`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          nombreRestaurante: formCategoria.restaurante, 
-          nuevaCategoria: { nombre: formCategoria.nombre } 
+        body: JSON.stringify({
+          nombreRestaurante: formCategoria.restaurante,
+          nuevaCategoria: { nombre: formCategoria.nombre }
         }),
       });
 
       const data = await res.json();
-      
+
       if (!res.ok) {
         throw new Error(data.error || 'Error al crear categoría');
       }
@@ -220,20 +220,20 @@ export default function Inventario() {
   const eliminarCategoria = async (restaurante: string, categoria: string) => {
     if (!window.confirm(`¿Eliminar la categoría ${categoria}?`)) return;
     setIsLoading(true);
-  
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/categoria/${encodeURIComponent(categoria)}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombreRestaurante: restaurante }),
       });
-  
+
       const data = await res.json();
-  
+
       if (!res.ok) {
         throw new Error(data.error || 'Error al eliminar categoría');
       }
-  
+
       await fetchData();
       setError(null);
     } catch (err) {
@@ -250,20 +250,20 @@ export default function Inventario() {
       return;
     }
     setIsLoading(true);
-  
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/categoria/${encodeURIComponent(actual)}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombreRestaurante: restaurante, nuevoNombre: nuevo }),
       });
-  
+
       const data = await res.json();
-  
+
       if (!res.ok) {
         throw new Error(data.error || 'Error al actualizar categoría');
       }
-  
+
       setEditandoCategoria(null);
       await fetchData();
       setError(null);
@@ -282,7 +282,7 @@ export default function Inventario() {
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
           {error}
-          <button 
+          <button
             onClick={() => setError(null)}
             className="absolute top-0 bottom-0 right-0 px-4 py-3"
           >
@@ -292,10 +292,9 @@ export default function Inventario() {
       )}
 
       {isLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded shadow-lg">
-            <p className="text-lg font-semibold">Cargando...</p>
-          </div>
+        <div className="flex flex-col items-center justify-center py-16">
+          <span className="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mb-4"></span>
+          <div className="text-center text-lg text-gray-500">Cargando productos...</div>
         </div>
       )}
 
@@ -328,8 +327,8 @@ export default function Inventario() {
                         }}
                         className="border px-2 py-1 rounded flex-grow"
                       />
-                      <select 
-                        value={formCategoria.restaurante} 
+                      <select
+                        value={formCategoria.restaurante}
                         onChange={(e) => setFormCategoria({ ...formCategoria, restaurante: e.target.value })}
                         className="border px-2 py-1 rounded"
                       >
@@ -365,34 +364,34 @@ export default function Inventario() {
                       <h3 className="font-semibold text-lg">{c.nombre}</h3>
                       <div className="flex gap-2">
 
-                    <button
-                      onClick={() => {
-                        setEditarCategoria({ ...editarCategoria, [c.nombre]: c.nombre });
-                        setEditandoCategoria(c.nombre);
-                      }}
-                      className="bg-yellow-500 text-white px-3 py-1 rounded"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => eliminarCategoria(r.nombreRestaurante, c.nombre)}
-                      className="bg-red-600 text-white px-3 py-1 rounded"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
+                        <button
+                          onClick={() => {
+                            setEditarCategoria({ ...editarCategoria, [c.nombre]: c.nombre });
+                            setEditandoCategoria(c.nombre);
+                          }}
+                          className="bg-yellow-500 text-white px-3 py-1 rounded"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => eliminarCategoria(r.nombreRestaurante, c.nombre)}
+                          className="bg-red-600 text-white px-3 py-1 rounded"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
                     </>
                   )}
                 </div>
                 <ul className="space-y-2">
                   {filtrarProductos(c.productos).map((p) => (
-                    <li key={`${p.restaurante}-${p.categoria}-${p.nombre}`} 
-                        className="flex justify-between items-center p-2 hover:bg-gray-50 rounded">
+                    <li key={`${p.restaurante}-${p.categoria}-${p.nombre}`}
+                      className="flex justify-between items-center p-2 hover:bg-gray-50 rounded">
                       <div className="flex-grow">
-                      <span className="font-medium">{p.nombre}</span> - 
-                      <span className="text-green-600 font-bold"> ${p.precio.toFixed(2)}</span>
-                      {p.descripcion && <span className="text-gray-600"> - {p.descripcion}</span>}
-                      <span className="text-blue-700 ml-2">Stock: {p.stock ?? 0}</span>
+                        <span className="font-medium">{p.nombre}</span> -
+                        <span className="text-green-600 font-bold"> ${p.precio.toFixed(2)}</span>
+                        {p.descripcion && <span className="text-gray-600"> - {p.descripcion}</span>}
+                        <span className="text-blue-700 ml-2">Stock: {p.stock ?? 0}</span>
                       </div>
                       <div className="space-x-2">
                         <button
@@ -454,15 +453,15 @@ export default function Inventario() {
               </div>
             </div>
             <div className="flex justify-end space-x-3 mt-4">
-              <button 
-                onClick={() => setEditandoProducto(null)} 
+              <button
+                onClick={() => setEditandoProducto(null)}
                 className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition"
                 disabled={isLoading}
               >
                 Cancelar
               </button>
-              <button 
-                onClick={guardarEdicionProducto} 
+              <button
+                onClick={guardarEdicionProducto}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
                 disabled={isLoading}
               >
@@ -478,10 +477,10 @@ export default function Inventario() {
         <div className="space-y-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Restaurante</label>
-            <select 
+            <select
               name="restaurante"
-              value={formProducto.restaurante} 
-              onChange={handleProductoChange} 
+              value={formProducto.restaurante}
+              onChange={handleProductoChange}
               className="block w-full border p-2 rounded"
               required
             >
@@ -493,13 +492,13 @@ export default function Inventario() {
               ))}
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
-            <select 
+            <select
               name="categoria"
-              value={formProducto.categoria} 
-              onChange={handleProductoChange} 
+              value={formProducto.categoria}
+              onChange={handleProductoChange}
               className="block w-full border p-2 rounded"
               required
               disabled={!formProducto.restaurante}
@@ -510,39 +509,39 @@ export default function Inventario() {
               ))}
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-            <input 
+            <input
               name="nombre"
-              placeholder="Nombre del producto" 
-              value={formProducto.nombre} 
-              onChange={handleProductoChange} 
-              className="block w-full border p-2 rounded" 
+              placeholder="Nombre del producto"
+              value={formProducto.nombre}
+              onChange={handleProductoChange}
+              className="block w-full border p-2 rounded"
               required
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-            <input 
+            <input
               name="descripcion"
-              placeholder="Descripción" 
-              value={formProducto.descripcion} 
-              onChange={handleProductoChange} 
-              className="block w-full border p-2 rounded" 
+              placeholder="Descripción"
+              value={formProducto.descripcion}
+              onChange={handleProductoChange}
+              className="block w-full border p-2 rounded"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Precio</label>
-            <input 
-              type="number" 
+            <input
+              type="number"
               name="precio"
-              placeholder="0.00" 
-              value={formProducto.precio || ''} 
-              onChange={handleProductoChange} 
-              className="block w-full border p-2 rounded" 
+              placeholder="0.00"
+              value={formProducto.precio || ''}
+              onChange={handleProductoChange}
+              className="block w-full border p-2 rounded"
               required
               min="0"
               step="0.01"
@@ -551,39 +550,39 @@ export default function Inventario() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
-            <input 
-              type="number" 
-              name="stock" 
-              placeholder="0" 
-              value={formProducto.stock} 
-              onChange={handleProductoChange} 
-              className="block w-full border p-2 rounded" 
+            <input
+              type="number"
+              name="stock"
+              placeholder="0"
+              value={formProducto.stock}
+              onChange={handleProductoChange}
+              className="block w-full border p-2 rounded"
               required
               min="0"
             />
           </div>
-          
-            {editandoProducto && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
-                <input
-                  type="number"
-                  name="stock"
-                  value={editandoProducto.stock}
-                  onChange={(e) =>
-                    setEditandoProducto({
-                      ...editandoProducto,
-                      stock: Number(e.target.value)
-                    })
-                  }
-                  className="block w-full border p-2 rounded"
-                  min="0"
-                />
-              </div>
-            )}
 
-          <button 
-            onClick={agregarProducto} 
+          {editandoProducto && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
+              <input
+                type="number"
+                name="stock"
+                value={editandoProducto.stock}
+                onChange={(e) =>
+                  setEditandoProducto({
+                    ...editandoProducto,
+                    stock: Number(e.target.value)
+                  })
+                }
+                className="block w-full border p-2 rounded"
+                min="0"
+              />
+            </div>
+          )}
+
+          <button
+            onClick={agregarProducto}
             className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition mt-2"
             disabled={!formProducto.nombre || !formProducto.precio || !formProducto.categoria || !formProducto.restaurante || isLoading}
           >
@@ -597,10 +596,10 @@ export default function Inventario() {
         <div className="space-y-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Restaurante</label>
-            <select 
+            <select
               name="restaurante"
-              value={formCategoria.restaurante} 
-              onChange={handleCategoriaChange} 
+              value={formCategoria.restaurante}
+              onChange={handleCategoriaChange}
               className="block w-full border p-2 rounded"
               required
             >
@@ -612,21 +611,21 @@ export default function Inventario() {
               ))}
             </select>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de Categoría</label>
-            <input 
+            <input
               name="nombre"
-              placeholder="Nombre de la categoría" 
-              value={formCategoria.nombre} 
-              onChange={handleCategoriaChange} 
-              className="block w-full border p-2 rounded" 
+              placeholder="Nombre de la categoría"
+              value={formCategoria.nombre}
+              onChange={handleCategoriaChange}
+              className="block w-full border p-2 rounded"
               required
             />
           </div>
-          
-          <button 
-            onClick={agregarCategoria} 
+
+          <button
+            onClick={agregarCategoria}
             className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition mt-2"
             disabled={!formCategoria.nombre || !formCategoria.restaurante || isLoading}
           >

@@ -127,7 +127,10 @@ const MenuPage: React.FC = () => {
         </div>
 
         {isLoading && (
-          <div className="text-center text-lg text-gray-500 py-10">Cargando productos...</div>
+          <div className="flex flex-col items-center justify-center py-16">
+            <span className="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin mb-4"></span>
+            <div className="text-center text-lg text-gray-500">Cargando productos...</div>
+          </div>
         )}
 
         {error && (
