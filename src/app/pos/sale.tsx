@@ -1,21 +1,12 @@
 "use client";
 import { useState } from "react";
+import { menuData } from "@/app/data/menu"; // Importa el array menuData
 
 interface Producto {
   nombre?: string;
   precio?: number | string;
   descripcion?: string;
   cantidad?: number;
-}
-
-interface Categoria {
-  nombre: string;
-  productos: Producto[];
-}
-
-interface Restaurante {
-  nombre: string;
-  categorias: Categoria[];
 }
 
 interface Venta {
@@ -28,55 +19,12 @@ const getInitialVenta = (): Venta => ({
   total: 0,
 });
 
-const initialData: Restaurante[] = [
-  {
-    nombre: "Escuela",
-    categorias: [
-      {
-        nombre: "Desayunos",
-        productos: [
-          {
-            nombre: "Huevos al gusto",
-            precio: 6700,
-            descripcion: "Fritos, revueltos, omelettes",
-            cantidad: 0,
-          },
-        ],
-      },
-      {
-        nombre: "Entradas",
-        productos: [
-          {
-            nombre: "Pan",
-            precio: 2000,
-            descripcion: "Pan",
-            cantidad: 0,
-          },
-          {
-            nombre: "Tostadas",
-            precio: 3000,
-            descripcion: "Tostadas con mantequilla",
-            cantidad: 0,
-          },
-          {
-            nombre: "Café",
-            precio: 2500,
-            descripcion: "Café espresso",
-            cantidad: 0,
-          },
-        ],
-      },
-    ],
-  },
-];
-
 export default function SalesPage() {
   const [venta, setVenta] = useState<Venta>(getInitialVenta());
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [showResumenModal, setShowResumenModal] = useState<boolean>(false);
 
   const agregarProducto = (producto: Producto) => {
-    // Verificar que el producto tenga nombre y precio definidos
     if (!producto.nombre || !producto.precio) return;
 
     const updatedVenta: Venta = {
@@ -89,7 +37,6 @@ export default function SalesPage() {
     );
 
     if (productoExistente) {
-      // Asegurarse de que la cantidad esté definida
       productoExistente.cantidad = (productoExistente.cantidad ?? 0) + 1;
     } else {
       updatedVenta.productos.push({ ...producto, cantidad: 1 });
@@ -112,7 +59,6 @@ export default function SalesPage() {
     );
 
     if (productoExistente) {
-      // Asegurarse de que la cantidad esté definida antes de restar
       if (productoExistente.cantidad! > 1) {
         productoExistente.cantidad! -= 1;
       } else {
@@ -127,10 +73,7 @@ export default function SalesPage() {
     setVenta(updatedVenta);
   };
 
-  const actualizarCantidadProducto = (
-    nombre: string,
-    nuevaCantidad: number
-  ) => {
+  const actualizarCantidadProducto = (nombre: string, nuevaCantidad: number) => {
     if (nuevaCantidad < 1) return;
 
     const updatedVenta: Venta = {
@@ -151,6 +94,17 @@ export default function SalesPage() {
     setVenta(updatedVenta);
   };
 
+  const actualizarNombreProducto = (nombreActual: string, nuevoNombre: string) => {
+    setVenta((prevVenta) => ({
+      ...prevVenta,
+      productos: prevVenta.productos.map((producto) =>
+        producto.nombre === nombreActual
+          ? { ...producto, nombre: nuevoNombre }
+          : producto
+      ),
+    }));
+  };
+
   const confirmarCompra = () => {
     setShowResumenModal(true);
   };
@@ -164,14 +118,18 @@ export default function SalesPage() {
     setVenta(getInitialVenta());
     setSearchTerm(""); // Reinicia la búsqueda
     setShowResumenModal(false);
-    console.log("Venta reiniciada:", getInitialVenta());
   };
 
   const buscarProductos = () => {
-    return initialData.flatMap((restaurante) =>
+    const term = searchTerm.trim().toLowerCase(); // Limpia el término de búsqueda
+    if (!term) return []; // Si no hay término de búsqueda, devuelve un array vacío
+
+    return menuData.flatMap((restaurante) =>
       restaurante.categorias.flatMap((categoria) =>
-        categoria.productos.filter((producto) =>
-          producto.nombre?.toLowerCase().includes(searchTerm.toLowerCase())
+        categoria.productos.filter(
+          (producto) =>
+            producto.nombre?.toLowerCase().includes(term) || // Busca en el nombre
+            producto.descripcion?.toLowerCase().includes(term) // Busca en la descripción
         )
       )
     );
@@ -198,38 +156,42 @@ export default function SalesPage() {
             <h2 className="text-xl font-semibold text-blue-600">
               Productos Disponibles
             </h2>
-            <div className="overflow-x-auto rounded-lg shadow">
-              <table className="min-w-full bg-white text-sm text-gray-700">
-                <thead className="bg-gray-100 text-xs uppercase text-gray-500">
-                  <tr>
-                    <th className="px-6 py-3 text-left">Producto</th>
-                    <th className="px-6 py-3 text-right">Precio</th>
-                    <th className="px-6 py-3 text-center">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {buscarProductos().map((producto) => (
-                    <tr
-                      key={producto.nombre}
-                      className="border-b hover:bg-gray-50"
-                    >
-                      <td className="px-6 py-4">{producto.nombre}</td>
-                      <td className="px-6 py-4 text-right">
-                        ${Number(producto.precio).toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <button
-                          onClick={() => agregarProducto(producto)}
-                          className="px-3 py-1 bg-green-500 text-white rounded-md text-xs hover:bg-green-600"
-                        >
-                          Agregar
-                        </button>
-                      </td>
+            {buscarProductos().length > 0 ? (
+              <div className="overflow-x-auto rounded-lg shadow">
+                <table className="min-w-full bg-white text-sm text-gray-700">
+                  <thead className="bg-gray-100 text-xs uppercase text-gray-500">
+                    <tr>
+                      <th className="px-6 py-3 text-left">Producto</th>
+                      <th className="px-6 py-3 text-right">Precio</th>
+                      <th className="px-6 py-3 text-center">Acciones</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {buscarProductos().map((producto, index) => (
+                      <tr
+                        key={`${producto.nombre}-${index}`} // Combina el nombre con el índice para garantizar unicidad
+                        className="border-b hover:bg-gray-50"
+                      >
+                        <td className="px-6 py-4">{producto.nombre}</td>
+                        <td className="px-6 py-4 text-right">
+                          ${Number(producto.precio).toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <button
+                            onClick={() => agregarProducto(producto)}
+                            className="px-3 py-1 bg-green-500 text-white rounded-md text-xs hover:bg-green-600"
+                          >
+                            Agregar
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-gray-500 mt-4">No se encontraron productos.</p>
+            )}
           </div>
         )}
 
@@ -248,11 +210,12 @@ export default function SalesPage() {
               </thead>
               <tbody>
                 {venta.productos.map((producto) => (
-                  <tr
-                    key={producto.nombre}
-                    className="border-b hover:bg-gray-50"
-                  >
-                    <td className="px-6 py-4">{producto.nombre}</td>
+                  <tr key={producto.nombre} className="border-b hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <span>
+                        {producto.nombre}
+                      </span>
+                    </td>
                     <td className="px-6 py-4 text-right">
                       ${Number(producto.precio).toLocaleString()}
                     </td>
@@ -315,7 +278,7 @@ export default function SalesPage() {
                     {producto.nombre} × {producto.cantidad}
                   </span>
                   <span>
-                    $$
+                    $
                     {(
                       Number(producto.precio) * producto.cantidad!
                     ).toLocaleString()}
