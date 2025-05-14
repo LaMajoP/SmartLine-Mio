@@ -7,6 +7,7 @@ interface Producto {
   precio: number;
   categoria: string;
   restaurante: string;
+  stock: number;
 }
 
 interface Categoria {
@@ -27,7 +28,8 @@ export default function Inventario() {
     descripcion: "",
     precio: 0,
     categoria: "",
-    restaurante: ""
+    restaurante: "",
+    stock: 0
   });
   const [formCategoria, setFormCategoria] = useState({
     nombre: "",
@@ -68,7 +70,7 @@ export default function Inventario() {
     const { name, value } = e.target;
     setFormProducto(prev => ({
       ...prev,
-      [name]: name === 'precio' ? Number(value) : value
+      [name]: name === 'precio' || name === 'stock' ? Number(value) : value
     }));
   };
 
@@ -96,7 +98,7 @@ export default function Inventario() {
         throw new Error(data.error || 'Error al crear producto');
       }
 
-      setFormProducto({ nombre: "", descripcion: "", precio: 0, categoria: "", restaurante: "" });
+      setFormProducto({ nombre: "", descripcion: "", precio: 0, categoria: "", restaurante: "", stock:0});
       await fetchData();
       setError(null);
     } catch (err) {
@@ -122,6 +124,7 @@ export default function Inventario() {
             nombre: editandoProducto.nombre,
             descripcion: editandoProducto.descripcion,
             precio: editandoProducto.precio,
+            stock: editandoProducto.stock
           },
         }),
       });
@@ -316,13 +319,35 @@ export default function Inventario() {
                     <div className="flex items-center space-x-2 w-full">
                       <input
                         value={editarCategoria[c.nombre] || c.nombre}
-                        onChange={(e) => setEditarCategoria({ ...editarCategoria, [c.nombre]: e.target.value })}
+                        onChange={(e) => {
+                          const nuevoValor = e.target.value;
+                          setEditarCategoria((prev) => ({
+                            ...prev,
+                            [c.nombre]: nuevoValor
+                          }));
+                        }}
                         className="border px-2 py-1 rounded flex-grow"
                       />
+                      <select 
+                        value={formCategoria.restaurante} 
+                        onChange={(e) => setFormCategoria({ ...formCategoria, restaurante: e.target.value })}
+                        className="border px-2 py-1 rounded"
+                      >
+                        <option value="">Selecciona restaurante</option>
+                        {datos.map((r) => (
+                          <option key={r.nombreRestaurante} value={r.nombreRestaurante}>
+                            {r.nombreRestaurante}
+                          </option>
+                        ))}
+                      </select>
                       <button
                         onClick={() => {
                           const nuevoNombre = editarCategoria[c.nombre] || c.nombre;
-                          guardarNombreCategoria(r.nombreRestaurante, c.nombre, nuevoNombre);
+                          if (formCategoria.restaurante) {
+                            guardarNombreCategoria(formCategoria.restaurante, c.nombre, nuevoNombre);
+                          } else {
+                            setError('Por favor selecciona un restaurante');
+                          }
                         }}
                         className="bg-green-600 text-white px-3 py-1 rounded"
                       >
@@ -338,15 +363,24 @@ export default function Inventario() {
                   ) : (
                     <>
                       <h3 className="font-semibold text-lg">{c.nombre}</h3>
-                      <button
-                        onClick={() => {
-                          setEditarCategoria({ ...editarCategoria, [c.nombre]: c.nombre });
-                          setEditandoCategoria(c.nombre);
-                        }}
-                        className="bg-yellow-500 text-white px-3 py-1 rounded"
-                      >
-                        Editar
-                      </button>
+                      <div className="flex gap-2">
+
+                    <button
+                      onClick={() => {
+                        setEditarCategoria({ ...editarCategoria, [c.nombre]: c.nombre });
+                        setEditandoCategoria(c.nombre);
+                      }}
+                      className="bg-yellow-500 text-white px-3 py-1 rounded"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => eliminarCategoria(r.nombreRestaurante, c.nombre)}
+                      className="bg-red-600 text-white px-3 py-1 rounded"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
                     </>
                   )}
                 </div>
@@ -355,9 +389,10 @@ export default function Inventario() {
                     <li key={`${p.restaurante}-${p.categoria}-${p.nombre}`} 
                         className="flex justify-between items-center p-2 hover:bg-gray-50 rounded">
                       <div className="flex-grow">
-                        <span className="font-medium">{p.nombre}</span> - 
-                        <span className="text-green-600 font-bold"> ${p.precio.toFixed(2)}</span>
-                        {p.descripcion && <span className="text-gray-600"> - {p.descripcion}</span>}
+                      <span className="font-medium">{p.nombre}</span> - 
+                      <span className="text-green-600 font-bold"> ${p.precio.toFixed(2)}</span>
+                      {p.descripcion && <span className="text-gray-600"> - {p.descripcion}</span>}
+                      <span className="text-blue-700 ml-2">Stock: {p.stock ?? 0}</span>
                       </div>
                       <div className="space-x-2">
                         <button
@@ -513,7 +548,40 @@ export default function Inventario() {
               step="0.01"
             />
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
+            <input 
+              type="number" 
+              name="stock" 
+              placeholder="0" 
+              value={formProducto.stock} 
+              onChange={handleProductoChange} 
+              className="block w-full border p-2 rounded" 
+              required
+              min="0"
+            />
+          </div>
           
+            {editandoProducto && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
+                <input
+                  type="number"
+                  name="stock"
+                  value={editandoProducto.stock}
+                  onChange={(e) =>
+                    setEditandoProducto({
+                      ...editandoProducto,
+                      stock: Number(e.target.value)
+                    })
+                  }
+                  className="block w-full border p-2 rounded"
+                  min="0"
+                />
+              </div>
+            )}
+
           <button 
             onClick={agregarProducto} 
             className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition mt-2"
