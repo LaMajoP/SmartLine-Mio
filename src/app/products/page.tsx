@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Header from "../components/header";
 import { useCart } from "@/context/CartContext";
 import { FaSearch } from "react-icons/fa";
@@ -24,7 +24,8 @@ type Restaurante = {
   categorias: Categoria[];
 };
 
-const MenuPage: React.FC = () => {
+// Componente que contiene la lógica principal
+function ProductContent() {
   const { addItem } = useCart();
   const [confirmation, setConfirmation] = useState<string | null>(null);
   const searchParams = useSearchParams();
@@ -33,7 +34,6 @@ const MenuPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch data from backend
   const fetchData = async () => {
     setIsLoading(true);
     try {
@@ -53,10 +53,8 @@ const MenuPage: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Filtrar restaurantes, categorías y productos basados en el searchQuery
   const filteredRestaurants = datos
     .map((restaurante) => {
       const filteredCategorias = restaurante.categorias
@@ -96,7 +94,6 @@ const MenuPage: React.FC = () => {
     })
     .filter((restaurante) => restaurante !== null);
 
-  // Maneja la acción de añadir al carrito
   const handleAddItem = (producto: Producto) => {
     addItem(producto);
     setConfirmation(`Añadido al carrito: ${producto.nombre}`);
@@ -114,7 +111,6 @@ const MenuPage: React.FC = () => {
     <main>
       <Header />
       <div className="p-10">
-        {/* Barra de búsqueda */}
         <div className="mb-6 flex items-center relative">
           <FaSearch className="absolute left-4 text-gray-500 text-xl" />
           <input
@@ -150,7 +146,6 @@ const MenuPage: React.FC = () => {
               {restaurante.nombreRestaurante}
             </h2>
 
-            {/* Mapeando las categorías y productos */}
             {restaurante.categorias.map((categoria, categoriaIndex) => (
               <div key={`${restaurante.nombreRestaurante}-${categoria.nombre}-${categoriaIndex}`} className="mt-6">
                 <h3 className="text-2xl font-semibold text-blue-600 mb-4">
@@ -188,7 +183,6 @@ const MenuPage: React.FC = () => {
         ))}
       </div>
 
-      {/* Mensaje de confirmación */}
       {confirmation && (
         <div className="fixed bottom-10 right-10 bg-blue-400 text-white py-2 px-4 rounded-lg shadow-md text-lg">
           {confirmation}
@@ -196,6 +190,15 @@ const MenuPage: React.FC = () => {
       )}
     </main>
   );
+}
+
+// Componente principal modificado
+const ProductsPage: React.FC = () => {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <ProductContent />
+    </Suspense>
+  );
 };
 
-export default MenuPage;
+export default ProductsPage;
