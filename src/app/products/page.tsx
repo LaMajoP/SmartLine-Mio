@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Header from "../components/header";
 import { menuData } from "../data/menu";
 import { useCart } from "@/context/CartContext";
@@ -13,8 +13,8 @@ type Producto = {
   descripcion: string;
 };
 
-
-const MenuPage: React.FC = () => {
+// Nuevo componente para el contenido
+function ProductContent() {
   const { addItem } = useCart();
   const [confirmation, setConfirmation] = useState<string | null>(null);
   const searchParams = useSearchParams();
@@ -150,6 +150,15 @@ const MenuPage: React.FC = () => {
         </div>
       )}
     </main>
+  );
+}
+
+// Componente principal modificado
+const MenuPage: React.FC = () => {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <ProductContent />
+    </Suspense>
   );
 };
 
