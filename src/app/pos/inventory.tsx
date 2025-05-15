@@ -157,46 +157,20 @@ export default function Inventario() {
   const eliminarProducto = async (rest: string, cat: string, nombre: string) => {
     if (!window.confirm(`¿Eliminar el producto ${nombre}?`)) return;
     setIsLoading(true);
-const eliminarProducto = async (rest: string, cat: string, nombre: string) => {
-  if (!window.confirm(`¿Eliminar el producto ${nombre}?`)) return;
-  setIsLoading(true);
+    
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/producto/${encodeURIComponent(nombre)}?nombreRestaurante=${encodeURIComponent(rest)}&nombreCategoria=${encodeURIComponent(cat)}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" }
+        }
+      );
 
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/producto/${encodeURIComponent(nombre)}?nombreRestaurante=${encodeURIComponent(rest)}&nombreCategoria=${encodeURIComponent(cat)}`,
-      {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" }
-        // No enviar body
-      }
-    );
-
-    let data = null;
-    const contentType = res.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
-      data = await res.json();
-    } else {
-      const text = await res.text();
-      throw new Error(text);
-    }
-
-    if (!res.ok) {
-      throw new Error(data?.error || 'Error al eliminar producto');
-    }
-
-    // Si todo sale bien, actualizar datos
-    fetchData();
-    setError(null);
-  } catch (err) {
-    setError(err instanceof Error ? err.message : "Error al eliminar producto");
-  } finally {
-    setIsLoading(false);
-  }
-};
       if (!res.ok) {
-        throw new Error(data?.error || 'Error al eliminar producto');
+        throw new Error('Error al eliminar producto');
       }
-  
+
       await fetchData();
       setError(null);
     } catch (err) {
