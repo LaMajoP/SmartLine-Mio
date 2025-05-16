@@ -325,22 +325,22 @@ export default function Inventario() {
                   {filtrarProductos(c.productos).map((p) => (
                     <li key={`${p.restaurante}-${p.categoria}-${p.nombre}`}
                       className="flex justify-between items-center p-2 hover:bg-gray-50 rounded">
-                      <div className="flex-grow">
+                      <div className="flex-grow min-w-0">
                         <span className="font-medium">{p.nombre}</span> -
                         <span className="text-green-600 font-bold"> ${p.precio.toFixed(2)}</span>
                         {p.descripcion && <span className="text-gray-600"> - {p.descripcion}</span>}
                         <span className="text-blue-700 ml-2">Stock: {p.stock ?? 0}</span>
                       </div>
-                      <div className="space-x-2">
+                      <div className="flex flex-row items-center gap-2 flex-shrink-0 ml-4">
                         <button
                           onClick={() => setEditandoProducto(p)}
-                          className="bg-yellow-500 text-white px-3 py-1 rounded text-sm"
+                          className="bg-yellow-500 text-white px-3 py-1 rounded text-sm whitespace-nowrap"
                         >
                           Editar
                         </button>
                         <button
                           onClick={() => eliminarProducto(p.restaurante, p.categoria, p.nombre)}
-                          className="bg-red-600 text-white px-3 py-1 rounded text-sm"
+                          className="bg-red-600 text-white px-3 py-1 rounded text-sm whitespace-nowrap"
                         >
                           Eliminar
                         </button>
