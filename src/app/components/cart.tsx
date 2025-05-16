@@ -18,7 +18,8 @@ const CartItems = () => {
   // Sincronizar localQuantities cada vez que items cambia
   useEffect(() => {
     setLocalQuantities(
-      Object.fromEntries(items.map((item) => [item.nombre, item.cantidad.toString()])))
+      Object.fromEntries(items.map((item) => [item.nombre, item.cantidad.toString()]))
+    );
   }, [items]);
 
   const handleChange = (nombre: string, value: string) => {
@@ -48,9 +49,20 @@ const CartItems = () => {
     deleteItem(nombre);
   };
 
-  const handlePay = () => {
-    alert("¡Gracias por tu compra!");
-    clearCart();
+  const userId = "TU_USER_ID_AQUI"; // Reemplaza por el userId real del usuario autenticado
+
+  const handlePay = async () => {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/historial`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, productos: items }),
+      });
+      alert("¡Gracias por tu compra!");
+      clearCart();
+    } catch (err) {
+      alert("Error al registrar la compra");
+    }
   };
 
   const total = items.reduce(

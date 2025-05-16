@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Header from "@/app/components/header";
 import { useRouter } from "next/navigation";
+import HistorialCompras from "@/app/components/HistorialCompras"; // <-- Importa el componente real
 
 export default function Home() {
   const router = useRouter();
@@ -46,7 +47,7 @@ export default function Home() {
       } catch (parseError) {
         throw new Error('Error al procesar la respuesta del servidor');
       }
-      
+
       if (!response.ok) {
         throw new Error(data?.error || data?.details || 'Error al enviar el feedback');
       }
@@ -55,7 +56,7 @@ export default function Home() {
       setSubmitMessage("¡Gracias por tu feedback!");
       setRating(0);
       setFeedback("");
-      
+
     } catch (error: any) {
       console.error("Error detallado:", error);
       setSubmitMessage(
@@ -81,25 +82,31 @@ export default function Home() {
             <div className="pt-5 flex gap-8">
               {[
                 {
-                  img: "https://www.simplyrecipes.com/thmb/cgJTtVSTy-ftI1dBM4P2x2FJf14=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Simply-Recipes-Bacon-Cheeseburger-LEAD-2b-6606850da0164612b5fb406a0e33f8df.jpg",
-                  title: "Bacon Cheese Burger",
-                  price: "$19.500",
+                  img: "https://mrmeat.es/wp-content/uploads/2022/12/plato-carne-celebracion.jpg.webp",
+                  title: "Plato especial - Carne",
+                  price: "$22000",
                   rank: "1",
                 },
                 {
-                  img: "https://www.paulinacocina.net/wp-content/uploads/2017/10/frenchfries-1200x900.jpg",
-                  title: "Porción de Papas",
-                  price: "$5.000",
+                  img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjtikaBhJSRYkEdVVp6NVo6JGwGSlwOrU1UI24NRmXiIwsQ8Nj0uEiWIkFVD2lPLr6-2rZdwdj218z8lj6pyuhxWCyVIqwMnSl23FSVz8KECeOs-STV04ftazy6rwSOvGY6nBDn0wFqPBw/s1600/muslo+de+pollo+con+sus+patatas+y+ensalada+con+vinagreta+de+yogur+2.JPG",
+                  title: "Plato especial - Pollo",
+                  price: "$21.600",
                   rank: "2",
                 },
                 {
-                  img: "https://m.media-amazon.com/images/I/81ceCCYnZmL._SL1500_.jpg",
-                  title: "Pepsi Wild Cherry",
-                  price: "$4.000",
+                  img: "https://olimpica.vtexassets.com/arquivos/ids/1296587/7702609005372.jpg?v=638781018815670000",
+                  title: "Agua sin gas",
+                  price: "$4.400",
                   rank: "3",
                 },
               ].map(({ img, title, price, rank }) => (
-                <div key={rank} className="text-center text-sm">
+                <div
+                  key={rank}
+                  className="text-center text-sm"
+                  onClick={() => router.push(`/products?search=${encodeURIComponent(title)}`)}
+                  style={{ cursor: "pointer" }}
+                  title="Buscar este producto"
+                >
                   <img
                     src={img}
                     alt={title}
@@ -124,9 +131,8 @@ export default function Home() {
                   <span
                     key={star}
                     onClick={() => setRating(star)}
-                    className={`cursor-pointer ${
-                      star <= rating ? 'text-yellow-400' : 'text-gray-300'
-                    } hover:text-yellow-400 transition-colors`}
+                    className={`cursor-pointer ${star <= rating ? 'text-yellow-400' : 'text-gray-300'
+                      } hover:text-yellow-400 transition-colors`}
                   >
                     ★
                   </span>
@@ -140,9 +146,8 @@ export default function Home() {
               />
 
               {submitMessage && (
-                <p className={`text-center text-sm mb-4 ${
-                  submitMessage.includes('error') ? 'text-red-500' : 'text-green-500'
-                }`}>
+                <p className={`text-center text-sm mb-4 ${submitMessage.includes('error') ? 'text-red-500' : 'text-green-500'
+                  }`}>
                   {submitMessage}
                 </p>
               )}
@@ -150,11 +155,10 @@ export default function Home() {
               <button
                 onClick={handleSubmitFeedback}
                 disabled={isSubmitting}
-                className={`w-full py-2 px-4 rounded-md ${
-                  isSubmitting 
-                    ? 'bg-gray-400' 
-                    : 'bg-blue-600 hover:bg-blue-700'
-                } text-white transition-colors`}
+                className={`w-full py-2 px-4 rounded-md ${isSubmitting
+                  ? 'bg-gray-400'
+                  : 'bg-blue-600 hover:bg-blue-700'
+                  } text-white transition-colors`}
               >
                 {isSubmitting ? 'Enviando...' : 'Enviar Feedback'}
               </button>
@@ -166,56 +170,7 @@ export default function Home() {
           </section>
 
           {/* Historial de Compras */}
-          <section className="bg-white p-6 rounded-2xl shadow-xl col-span-2">
-            <h2 className="font-semibold text-2xl mb-6 text-gray-800">
-              ← Historial de Compras
-            </h2>
-            <div className="pt-5 grid grid-cols-2 gap-8">
-              {[
-                {
-                  id: 1,
-                  title: "Bacon Cheese Burger",
-                  price: "$19.500",
-                  img: "https://www.simplyrecipes.com/thmb/cgJTtVSTy-ftI1dBM4P2x2FJf14=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Simply-Recipes-Bacon-Cheeseburger-LEAD-2b-6606850da0164612b5fb406a0e33f8df.jpg",
-                },
-                {
-                  id: 2,
-                  title: "Porción de Papas",
-                  price: "$5.000",
-                  img: "https://www.paulinacocina.net/wp-content/uploads/2017/10/frenchfries-1200x900.jpg",
-                },
-                {
-                  id: 3,
-                  title: "Pepsi Wild Cherry",
-                  price: "$4.000",
-                  img: "https://m.media-amazon.com/images/I/81ceCCYnZmL._SL1500_.jpg",
-                },
-                {
-                  id: 4,
-                  title: "Wrap de Pollo",
-                  price: "$14.000",
-                  img: "https://www.eatingwell.com/thmb/kvgCrxKhAtLwG9NTugifTXamdoc=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/EW-Veggie-Wrap-hero-1x1-15189_preview_maxWidth_4000_maxHeight_4000_ppi_300_quality_100-4e96432654934ca0a769a29756b122d4.jpg",
-                },
-              ].map(({ id, title, price, img }) => (
-                <div
-                  key={id}
-                  className="flex items-center gap-6 border-2 rounded-2xl p-2 border-gray-300"
-                >
-                  <img
-                    src={img}
-                    alt={title}
-                    className="w-16 h-16 object-cover rounded-md"
-                  />
-                  <div>
-                    <p className="font-medium text-gray-700">{title}</p>
-                    <p className="text-gray-500 text-sm">{price}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          
+          <HistorialCompras /> {/* <-- Aquí va el historial real */}
         </div>
 
         {/* Columna derecha con la imagen, ahora ocupa el 40% del espacio */}

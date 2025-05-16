@@ -311,74 +311,15 @@ export default function Inventario() {
             {r.categorias.map((c) => (
               <div key={c.nombre} className="border p-4 rounded shadow mb-3">
                 <div className="flex justify-between items-center mb-2">
-                  {editandoCategoria === c.nombre ? (
-                    <div className="flex items-center space-x-2 w-full">
-                      <input
-                        value={editarCategoria[c.nombre] || c.nombre}
-                        onChange={(e) => {
-                          const nuevoValor = e.target.value;
-                          setEditarCategoria((prev) => ({
-                            ...prev,
-                            [c.nombre]: nuevoValor
-                          }));
-                        }}
-                        className="border px-2 py-1 rounded flex-grow"
-                      />
-                      <select
-                        value={formCategoria.restaurante}
-                        onChange={(e) => setFormCategoria({ ...formCategoria, restaurante: e.target.value })}
-                        className="border px-2 py-1 rounded"
-                      >
-                        <option value="">Selecciona restaurante</option>
-                        {datos.map((r) => (
-                          <option key={r.nombreRestaurante} value={r.nombreRestaurante}>
-                            {r.nombreRestaurante}
-                          </option>
-                        ))}
-                      </select>
-                      <button
-                        onClick={() => {
-                          const nuevoNombre = editarCategoria[c.nombre] || c.nombre;
-                          if (formCategoria.restaurante) {
-                            guardarNombreCategoria(formCategoria.restaurante, c.nombre, nuevoNombre);
-                          } else {
-                            setError('Por favor selecciona un restaurante');
-                          }
-                        }}
-                        className="bg-green-600 text-white px-3 py-1 rounded"
-                      >
-                        Guardar
-                      </button>
-                      <button
-                        onClick={() => setEditandoCategoria(null)}
-                        className="bg-gray-500 text-white px-3 py-1 rounded"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <h3 className="font-semibold text-lg">{c.nombre}</h3>
-                      <div className="flex gap-2">
-
-                        <button
-                          onClick={() => {
-                            setEditarCategoria({ ...editarCategoria, [c.nombre]: c.nombre });
-                            setEditandoCategoria(c.nombre);
-                          }}
-                          className="bg-yellow-500 text-white px-3 py-1 rounded"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          onClick={() => eliminarCategoria(r.nombreRestaurante, c.nombre)}
-                          className="bg-red-600 text-white px-3 py-1 rounded"
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    </>
-                  )}
+                  <h3 className="font-semibold text-lg">{c.nombre}</h3>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => eliminarCategoria(r.nombreRestaurante, c.nombre)}
+                      className="bg-red-600 text-white px-3 py-1 rounded"
+                    >
+                      Eliminar Categoría
+                    </button>
+                  </div>
                 </div>
                 <ul className="space-y-2">
                   {filtrarProductos(c.productos).map((p) => (

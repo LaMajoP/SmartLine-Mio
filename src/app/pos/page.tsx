@@ -1,13 +1,18 @@
 "use client";
 import React, { useState } from "react";
-import Inventario from "@/app/pos/inventory"; // Ajusta la ruta según donde lo ubiques
-import Ventas from "@/app/pos/sale"; // Ajusta la ruta según donde lo ubiques
+import Inventario from "@/app/pos/inventory";
+import Ventas from "@/app/pos/sale";
 import Image from "next/image";
 import SmartLine_Logo from "@/assets/SmartLine_Logo.webp";
-import { UserDropdownMenu } from "@/app/components/userDropMenu";
+import { useRouter } from "next/navigation";
 
 export default function POSPage() {
   const [view, setView] = useState<"inventario" | "vender" | null>(null);
+  const router = useRouter();
+
+  const handleLogout = () => {
+    router.push("/login");
+  };
 
   const renderContent = () => {
     switch (view) {
@@ -25,7 +30,12 @@ export default function POSPage() {
       {/* Barra de navegación */}
       <nav className="flex items-center justify-between bg-white shadow-md px-10 py-4">
         <Image src={SmartLine_Logo} alt="SmartLine Logo" width={225} />
-        <UserDropdownMenu />
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 cursor-pointer hover:bg-red-600 text-white px-4 py-2 rounded-2xl font-semibold transition"
+        >
+          Cerrar sesión
+        </button>
       </nav>
 
       {/* Botones de selección */}
