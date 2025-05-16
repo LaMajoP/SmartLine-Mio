@@ -1,17 +1,27 @@
 "use client";
-import { useState } from "react";
-import { menuData } from "@/app/data/menu"; // Importa el array menuData
+import { useState, useEffect } from "react";
 
 interface Producto {
   nombre?: string;
   precio?: number | string;
   descripcion?: string;
   cantidad?: number;
+  stock?: number; // Agregado para manejar el stock
 }
 
 interface Venta {
   productos: Producto[];
   total: number;
+}
+
+interface Categoria {
+  nombre: string;
+  productos: Producto[];
+}
+
+interface Restaurante {
+  nombreRestaurante: string;
+  categorias: Categoria[];
 }
 
 const getInitialVenta = (): Venta => ({
@@ -23,10 +33,61 @@ export default function SalesPage() {
   const [venta, setVenta] = useState<Venta>(getInitialVenta());
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [showResumenModal, setShowResumenModal] = useState<boolean>(false);
+  const [datos, setDatos] = useState<Restaurante[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const agregarProducto = (producto: Producto) => {
-    if (!producto.nombre || !producto.precio) return;
+  // Cargar productos desde el backend
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/inventario-completo`
+      );
+      if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+      const data = await res.json();
+      setDatos(data);
+      setError(null);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Error al cargar productos"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // Buscar productos en el inventario cargado
+  const buscarProductos = () => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return [];
+    return datos.flatMap((restaurante) =>
+      restaurante.categorias.flatMap((categoria) =>
+        categoria.productos.filter(
+          (producto) =>
+            producto.nombre?.toLowerCase().includes(term) ||
+            producto.descripcion?.toLowerCase().includes(term)
+        )
+      )
+    );
+  };
+
+  // Agregar producto a la venta (y actualizar stock en backend)
+  const agregarProducto = async (producto: Producto) => {
+    if (!producto.nombre || !producto.precio || producto.stock === 0) return;
+
+    // Verifica stock local antes de agregar
+    const enVenta = venta.productos.find((p) => p.nombre === producto.nombre);
+    if ((enVenta?.cantidad ?? 0) >= producto.stock!) {
+      setError("No hay suficiente stock");
+      return;
+    }
+
+    // Actualiza venta local
     const updatedVenta: Venta = {
       productos: [...venta.productos],
       total: venta.total,
@@ -46,31 +107,60 @@ export default function SalesPage() {
     setVenta(updatedVenta);
   };
 
-  const eliminarProducto = (producto: Producto) => {
-    if (!producto.nombre || !producto.precio) return;
-
-    const updatedVenta: Venta = {
-      productos: [...venta.productos],
-      total: venta.total,
-    };
-
-    const productoExistente = updatedVenta.productos.find(
-      (p) => p.nombre === producto.nombre
-    );
-
-    if (productoExistente) {
-      if (productoExistente.cantidad! > 1) {
-        productoExistente.cantidad! -= 1;
-      } else {
-        updatedVenta.productos = updatedVenta.productos.filter(
-          (p) => p.nombre !== producto.nombre
+  // Al finalizar la compra, actualiza el stock en el backend
+  const finalizarCompra = async () => {
+    setIsLoading(true);
+    try {
+      // Actualiza stock de cada producto vendido
+      for (const producto of venta.productos) {
+        await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/producto/${encodeURIComponent(
+            producto.nombre!
+          )}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              nombreRestaurante: datos.find((r) =>
+                r.categorias.some((c) =>
+                  c.productos.some((p) => p.nombre === producto.nombre)
+                )
+              )?.nombreRestaurante,
+              nombreCategoria: datos
+                .flatMap((r) => r.categorias)
+                .find((c) => c.productos.some((p) => p.nombre === producto.nombre))
+                ?.nombre,
+              datosActualizados: {
+                stock: (
+                  datos
+                    .flatMap((r) => r.categorias)
+                    .flatMap((c) => c.productos)
+                    .find((p) => p.nombre === producto.nombre)?.stock ?? 0
+                ) - (producto.cantidad ?? 1),
+              },
+            }),
+          }
         );
       }
-
-      updatedVenta.total -= Number(producto.precio);
+      setVenta(getInitialVenta());
+      setShowResumenModal(false);
+      setSearchTerm("");
+      await fetchData();
+      setError(null);
+      alert("¡Compra confirmada!");
+    } catch (err) {
+      setError("Error al actualizar stock");
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    setVenta(updatedVenta);
+  const cerrarModal = () => {
+    setShowResumenModal(false);
+  };
+
+  const confirmarCompra = () => {
+    setShowResumenModal(true);
   };
 
   const actualizarCantidadProducto = (nombre: string, nuevaCantidad: number) => {
@@ -105,34 +195,14 @@ export default function SalesPage() {
     }));
   };
 
-  const confirmarCompra = () => {
-    setShowResumenModal(true);
-  };
-
-  const cerrarModal = () => {
-    setShowResumenModal(false);
-  };
-
-  const finalizarCompra = () => {
-    alert("¡Compra confirmada!");
-    setVenta(getInitialVenta());
-    setSearchTerm(""); // Reinicia la búsqueda
-    setShowResumenModal(false);
-  };
-
-  const buscarProductos = () => {
-    const term = searchTerm.trim().toLowerCase(); // Limpia el término de búsqueda
-    if (!term) return []; // Si no hay término de búsqueda, devuelve un array vacío
-
-    return menuData.flatMap((restaurante) =>
-      restaurante.categorias.flatMap((categoria) =>
-        categoria.productos.filter(
-          (producto) =>
-            producto.nombre?.toLowerCase().includes(term) || // Busca en el nombre
-            producto.descripcion?.toLowerCase().includes(term) // Busca en la descripción
-        )
-      )
-    );
+  const eliminarProducto = (producto: Producto) => {
+    setVenta((prevVenta) => ({
+      ...prevVenta,
+      productos: prevVenta.productos.filter((p) => p.nombre !== producto.nombre),
+      total:
+        prevVenta.total -
+        (Number(producto.precio) * (producto.cantidad ?? 1)),
+    }));
   };
 
   return (
