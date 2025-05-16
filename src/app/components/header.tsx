@@ -51,7 +51,7 @@ export default function Header() {
         <div className="flex items-center gap-4 md:gap-6 flex-1 justify-end">
           <form
             onSubmit={handleSearchSubmit}
-            className="flex items-center border-1 border-black rounded-full overflow-hidden bg-gray-100 w-44 sm:w-72 md:w-96 shadow focus-within:ring-2 focus-within:ring-blue-300 transition-all"
+            className="flex items-center border-1 border-gray-300 rounded-full overflow-hidden bg-gray-100 w-44 sm:w-72 md:w-96 shadow focus-within:ring-2 focus-within:ring-blue-300 transition-all"
           >
             <input
               type="text"
@@ -62,7 +62,7 @@ export default function Header() {
             />
             <button
               type="submit"
-              className="p-3 text-black"
+              className="p-3 text-black cursor-pointer"
               aria-label="Buscar"
             >
               <Search className="w-5 h-5" />

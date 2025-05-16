@@ -56,10 +56,12 @@ const CartItems = () => {
       await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/historial`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, productos: items }),
+        body: JSON.stringify({ userId, productos: items }), // items incluye nombre, cantidad, etc.
       });
       alert("¡Gracias por tu compra!");
       clearCart();
+      // Opcional: recarga productos para actualizar stock en pantalla
+      window.location.reload();
     } catch (err) {
       alert("Error al registrar la compra");
     }
@@ -143,3 +145,5 @@ const CartItems = () => {
 };
 
 export default CartItems;
+
+// Después de await productoRef.update({ stock: nuevoStock });
