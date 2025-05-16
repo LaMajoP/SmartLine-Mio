@@ -1,10 +1,73 @@
 'use client';
+import { useState } from "react";
 import Header from "@/app/components/header";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter();
-    return (
+  const [rating, setRating] = useState<number>(0);
+  const [feedback, setFeedback] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submitMessage, setSubmitMessage] = useState<string>("");
+
+  // Función para manejar el envío del feedback
+  const handleSubmitFeedback = async () => {
+    if (rating === 0) {
+      setSubmitMessage("Por favor selecciona una calificación");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      console.log('Enviando feedback:', {
+        rating,
+        comment: feedback,
+        restaurant: "Arcos",
+        userId: "abc123kfIduXZ80p"
+      });
+
+      const response = await fetch('http://localhost:3001/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          rating: Number(rating),
+          comment: feedback,
+          restaurant: "Arcos",
+          userId: "abc123kfIduXZ80p"
+        })
+      });
+
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        throw new Error('Error al procesar la respuesta del servidor');
+      }
+      
+      if (!response.ok) {
+        throw new Error(data?.error || data?.details || 'Error al enviar el feedback');
+      }
+
+      console.log('Respuesta exitosa:', data);
+      setSubmitMessage("¡Gracias por tu feedback!");
+      setRating(0);
+      setFeedback("");
+      
+    } catch (error: any) {
+      console.error("Error detallado:", error);
+      setSubmitMessage(
+        error instanceof Error ? error.message : "Hubo un error al enviar tu feedback"
+      );
+    } finally {
+      setIsSubmitting(false);
+      setTimeout(() => setSubmitMessage(""), 3000);
+    }
+  };
+
+  return (
     <main className="bg-gray-50 h-screen overflow-hidden">
       <Header />
       <div className="grid grid-cols-1 md:grid-cols-5 gap-8 p-8 h-[calc(100vh-112px)]">
@@ -51,27 +114,56 @@ export default function Home() {
           </section>
 
           {/* Califica Servicio */}
-          <section className=" p-6 rounded-xl shadow-2xl bg-white h-fit">
+          <section className="p-6 rounded-xl shadow-2xl bg-white h-fit">
             <h2 className="font-semibold text-2xl mb-6 text-gray-800">
               ☆ Califica Nuestro Servicio
             </h2>
             <div className="pt-5">
-              <div className="flex justify-center gap-2 text-yellow-400 text-3xl mb-3">
-                {[1, 2, 3, 4, 5].map((_, i) => (
-                  <span key={i}>★</span>
+              <div className="flex justify-center gap-2 text-3xl mb-3">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    onClick={() => setRating(star)}
+                    className={`cursor-pointer ${
+                      star <= rating ? 'text-yellow-400' : 'text-gray-300'
+                    } hover:text-yellow-400 transition-colors`}
+                  >
+                    ★
+                  </span>
                 ))}
               </div>
               <textarea
-                className="w-full p-4 rounded-md border border-gray-300 mb-6 text-sm"
+                className="w-full p-4 rounded-md border border-gray-300 mb-4 text-sm"
                 placeholder="Agrega una sugerencia que tengas para nosotros"
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
               />
 
-              <p className="text-center text-sm text-gray-600">
+              {submitMessage && (
+                <p className={`text-center text-sm mb-4 ${
+                  submitMessage.includes('error') ? 'text-red-500' : 'text-green-500'
+                }`}>
+                  {submitMessage}
+                </p>
+              )}
+
+              <button
+                onClick={handleSubmitFeedback}
+                disabled={isSubmitting}
+                className={`w-full py-2 px-4 rounded-md ${
+                  isSubmitting 
+                    ? 'bg-gray-400' 
+                    : 'bg-blue-600 hover:bg-blue-700'
+                } text-white transition-colors`}
+              >
+                {isSubmitting ? 'Enviando...' : 'Enviar Feedback'}
+              </button>
+
+              <p className="text-center text-sm text-gray-600 mt-4">
                 ¿Qué tal estuvo tu última compra?
               </p>
             </div>
           </section>
-
 
           {/* Historial de Compras */}
           <section className="bg-white p-6 rounded-2xl shadow-xl col-span-2">
