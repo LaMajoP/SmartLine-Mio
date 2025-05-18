@@ -9,7 +9,7 @@ interface FeedbackItem {
   calificacion: number;
   fecha: string;
 }
-
+//feedback
 export default function Feedback() {
   const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
