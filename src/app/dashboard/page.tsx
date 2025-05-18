@@ -88,15 +88,15 @@ export default function Home() {
   return (
     <main className="bg-gray-50 h-screen overflow-hidden">
       <Header />
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-8 p-8 h-[calc(100vh-112px)]">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-8 p-4 md:p-8 h-[calc(100vh-112px)]">
         {/* Columna izquierda con scroll interno, ahora ocupa 60% del espacio */}
-        <div className="grid grid-cols-2 gap-8 md:col-span-3 space-y-8 overflow-y-auto">
+        <div className="flex flex-col gap-6 md:gap-8 md:col-span-3 overflow-y-auto">
           {/* Favoritos */}
-          <section className="bg-white p-6 rounded-2xl shadow-xl">
-            <h2 className="font-semibold text-2xl mb-6 text-gray-800">
-              ♡ Favoritos (Top 3)
+          <section className="bg-white p-4 md:p-6 rounded-2xl shadow-xl w-full">
+            <h2 className="font-semibold text-xl md:text-2xl mb-4 md:mb-6 text-gray-800">
+              ♡ Recomendados (Top 3)
             </h2>
-            <div className="pt-5 flex gap-8">
+            <div className="pt-3 md:pt-5 flex flex-col sm:flex-row gap-4 md:gap-8">
               {[
                 {
                   img: "https://mrmeat.es/wp-content/uploads/2022/12/plato-carne-celebracion.jpg.webp",
@@ -119,7 +119,7 @@ export default function Home() {
               ].map(({ img, title, price, rank }) => (
                 <div
                   key={rank}
-                  className="text-center text-sm"
+                  className="text-center text-sm flex-1 min-w-[120px] max-w-[180px] mx-auto"
                   onClick={() => router.push(`/products?search=${encodeURIComponent(title)}`)}
                   style={{ cursor: "pointer" }}
                   title="Buscar este producto"
@@ -138,12 +138,12 @@ export default function Home() {
           </section>
 
           {/* Califica Servicio */}
-          <section className="p-6 rounded-xl shadow-2xl bg-white h-fit">
-            <h2 className="font-semibold text-2xl mb-6 text-gray-800">
+          <section className="p-4 md:p-6 rounded-xl shadow-2xl bg-white w-full h-fit">
+            <h2 className="font-semibold text-xl md:text-2xl mb-4 md:mb-6 text-gray-800">
               ☆ Califica Nuestro Servicio
             </h2>
-            <div className="pt-5">
-              <div className="flex justify-center gap-2 text-3xl mb-3">
+            <div className="pt-3 md:pt-5">
+              <div className="flex justify-center gap-2 text-2xl md:text-3xl mb-2 md:mb-3">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <span
                     key={star}
@@ -156,14 +156,14 @@ export default function Home() {
                 ))}
               </div>
               <textarea
-                className="w-full p-4 rounded-md border border-gray-300 mb-4 text-sm"
+                className="w-full p-3 md:p-4 rounded-md border border-gray-300 mb-3 md:mb-4 text-sm"
                 placeholder="Agrega una sugerencia que tengas para nosotros"
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
               />
 
               {submitMessage && (
-                <p className={`text-center text-sm mb-4 ${submitMessage.includes('error') ? 'text-red-500' : 'text-green-500'
+                <p className={`text-center text-sm mb-3 md:mb-4 ${submitMessage.includes('error') ? 'text-red-500' : 'text-green-500'
                   }`}>
                   {submitMessage}
                 </p>
@@ -180,14 +180,16 @@ export default function Home() {
                 {isSubmitting ? 'Enviando...' : 'Enviar Feedback'}
               </button>
 
-              <p className="text-center text-sm text-gray-600 mt-4">
+              <p className="text-center text-xs md:text-sm text-gray-600 mt-3 md:mt-4">
                 ¿Qué tal estuvo tu última compra?
               </p>
             </div>
           </section>
 
           {/* Historial de Compras */}
-          <HistorialCompras /> 
+          <div className="w-full">
+            <HistorialCompras />
+          </div>
         </div>
 
         {/* Columna derecha con la imagen, ahora ocupa el 40% del espacio */}
