@@ -46,6 +46,7 @@ export default function LoginForm() {
         const role = data.user.role?.toLowerCase();
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", role); // opcional: guardar el rol también
+        localStorage.setItem("user", JSON.stringify(data.user));
 
         if (role === "cliente") {
           setTimeout(() => {

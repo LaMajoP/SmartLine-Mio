@@ -8,12 +8,28 @@ type Producto = {
   nombre: string;
   precio: number;
   descripcion: string;
+  cantidad: number;
+  restaurante?: string;
+  categoria?: string;
 };
 
 const CartItems = () => {
   const { items, removeItem, clearCart, addItem, updateItemQuantity, deleteItem } = useCart();
 
   const [localQuantities, setLocalQuantities] = useState<{ [key: string]: string }>({});
+  const [userId, setUserId] = useState("");
+
+  // Obtener userId desde localStorage de forma reactiva
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        setUserId(user.userId || "");
+      } catch {
+        setUserId("");
+      }
+    }
+  }, []);
 
   // Sincronizar localQuantities cada vez que items cambia
   useEffect(() => {
@@ -49,21 +65,30 @@ const CartItems = () => {
     deleteItem(nombre);
   };
 
-  const userId = "TU_USER_ID_AQUI"; // Reemplaza por el userId real del usuario autenticado
-
   const handlePay = async () => {
+    if (!userId) {
+      alert("Debes iniciar sesión para realizar la compra.");
+      return;
+    }
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/historial`, {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/historial`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, productos: items }), // items incluye nombre, cantidad, etc.
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ userId, productos: items }),
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Error en la compra");
+      }
       alert("¡Gracias por tu compra!");
       clearCart();
-      // Opcional: recarga productos para actualizar stock en pantalla
       window.location.reload();
-    } catch (err) {
-      alert("Error al registrar la compra");
+    } catch (err: any) {
+      alert(err.message || "Error al registrar la compra");
     }
   };
 
@@ -114,7 +139,7 @@ const CartItems = () => {
           </div>
 
           <button
-            onClick={() => handleDelete(item.nombre)} // eliminar el producto completamente
+            onClick={() => handleDelete(item.nombre)}
             className="text-red-500 text-sm hover:underline font-medium ml-4 hover:text-red-700 transition duration-300"
           >
             Quitar
@@ -145,5 +170,3 @@ const CartItems = () => {
 };
 
 export default CartItems;
-
-// Después de await productoRef.update({ stock: nuevoStock });

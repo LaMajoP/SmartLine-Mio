@@ -26,23 +26,40 @@ export default function HistorialCompras() {
   const [datos, setDatos] = useState<Restaurante[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string>("");
+  const [userLoaded, setUserLoaded] = useState(false);
 
-  const fetchHistorial = async () => {
+  // Obtener userId desde localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        setUserId(user.userId || "");
+      } catch {
+        setUserId("");
+      }
+      setUserLoaded(true);
+    }
+  }, []);
+
+  const fetchHistorial = async (uid: string) => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/historial`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/historial?userId=${uid}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
         }
       );
       if (!res.ok) {
         throw new Error(`Error ${res.status}: ${res.statusText}`);
       }
       const data = await res.json();
+      console.log("Historial recibido:", data); // <-- Agrega esta línea
       setDatos(data);
       setError(null);
     } catch (err) {
@@ -53,8 +70,10 @@ export default function HistorialCompras() {
   };
 
   useEffect(() => {
-    fetchHistorial();
-  }, []);
+    if (userId) {
+      fetchHistorial(userId);
+    }
+  }, [userId]);
 
   const filteredRestaurants = datos
     .map((restaurante) => {
@@ -120,9 +139,7 @@ export default function HistorialCompras() {
                 <div>
                   <p className="font-medium text-gray-700">{producto.nombre}</p>
                   <p className="text-gray-500 text-sm">{producto.precio ? `$${producto.precio}` : ""}</p>
-                  {producto.fechaCompra && (
-                    <p className="text-xs text-gray-400">Fecha: {new Date(producto.fechaCompra).toLocaleDateString()}</p>
-                  )}
+                  <p className="text-gray-500 text-sm">{producto.descripcion}</p>
                   <p className="text-xs text-gray-400">{categoria.nombre} - {restaurante.nombreRestaurante}</p>
                 </div>
               </div>
