@@ -44,7 +44,14 @@ export default function Inventario() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/inventario-completo`);
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/inventario-completo`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
       if (!res.ok) {
         throw new Error(`Error ${res.status}: ${res.statusText}`);
       }
@@ -85,19 +92,19 @@ export default function Inventario() {
       if (!formProducto.restaurante || !formProducto.categoria || !formProducto.nombre || !formProducto.precio) {
         throw new Error('Todos los campos son requeridos');
       }
-
+      const token = localStorage.getItem("token");
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/producto`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify(formProducto),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
         throw new Error(data.error || 'Error al crear producto');
       }
-
       setFormProducto({ nombre: "", descripcion: "", precio: 0, categoria: "", restaurante: "", stock: 0 });
       await fetchData();
       setError(null);
@@ -112,11 +119,14 @@ export default function Inventario() {
   const guardarEdicionProducto = async () => {
     if (!editandoProducto) return;
     setIsLoading(true);
-
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/producto/${encodeURIComponent(editandoProducto.nombre)}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           nombreRestaurante: editandoProducto.restaurante,
           nombreCategoria: editandoProducto.categoria,
@@ -128,21 +138,17 @@ export default function Inventario() {
           },
         }),
       });
-
       const contentType = res.headers.get("content-type");
       let data;
-
       if (contentType?.includes("application/json")) {
         data = await res.json();
       } else {
         const text = await res.text();
         throw new Error(text);
       }
-
       if (!res.ok) {
         throw new Error(data.error || "Error al actualizar producto");
       }
-
       setEditandoProducto(null);
       await fetchData();
       setError(null);
@@ -157,20 +163,21 @@ export default function Inventario() {
   const eliminarProducto = async (rest: string, cat: string, nombre: string) => {
     if (!window.confirm(`¿Eliminar el producto ${nombre}?`)) return;
     setIsLoading(true);
-    
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/producto/${encodeURIComponent(nombre)}?nombreRestaurante=${encodeURIComponent(rest)}&nombreCategoria=${encodeURIComponent(cat)}`,
         {
           method: "DELETE",
-          headers: { "Content-Type": "application/json" }
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
         }
       );
-
       if (!res.ok) {
         throw new Error('Error al eliminar producto');
       }
-
       await fetchData();
       setError(null);
     } catch (err) {
@@ -187,22 +194,22 @@ export default function Inventario() {
       if (!formCategoria.restaurante || !formCategoria.nombre) {
         throw new Error('Todos los campos son requeridos');
       }
-
+      const token = localStorage.getItem("token");
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/categoria`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           nombreRestaurante: formCategoria.restaurante,
           nuevaCategoria: { nombre: formCategoria.nombre }
         }),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
         throw new Error(data.error || 'Error al crear categoría');
       }
-
       setFormCategoria({ nombre: "", restaurante: "" });
       await fetchData();
       setError(null);
@@ -217,20 +224,20 @@ export default function Inventario() {
   const eliminarCategoria = async (restaurante: string, categoria: string) => {
     if (!window.confirm(`¿Eliminar la categoría ${categoria}?`)) return;
     setIsLoading(true);
-
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/categoria/${encodeURIComponent(categoria)}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({ nombreRestaurante: restaurante }),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
         throw new Error(data.error || 'Error al eliminar categoría');
       }
-
       await fetchData();
       setError(null);
     } catch (err) {
@@ -247,20 +254,20 @@ export default function Inventario() {
       return;
     }
     setIsLoading(true);
-
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/categoria/${encodeURIComponent(actual)}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({ nombreRestaurante: restaurante, nuevoNombre: nuevo }),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
         throw new Error(data.error || 'Error al actualizar categoría');
       }
-
       setEditandoCategoria(null);
       await fetchData();
       setError(null);

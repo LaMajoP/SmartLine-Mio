@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Inventario from "@/app/pos/inventory";
 import Ventas from "@/app/pos/sale";
 import Image from "next/image";
@@ -9,6 +9,14 @@ import { useRouter } from "next/navigation";
 export default function POSPage() {
   const [view, setView] = useState<"inventario" | "vender" | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    if (!token || role !== "vendedor") {
+      router.push("/login");
+    }
+  }, []);
 
   const handleLogout = () => {
     router.push("/login");

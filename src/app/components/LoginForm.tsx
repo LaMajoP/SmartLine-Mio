@@ -43,14 +43,15 @@ export default function LoginForm() {
       } else {
         const data = await res.json();
         setSuccess("¡Inicio de sesión exitoso!");
+        const role = data.user.role?.toLowerCase();
         localStorage.setItem("token", data.token);
-        // Redirección según el rol
-        if (data.role === "cliente") {
+        localStorage.setItem("role", role); // opcional: guardar el rol también
+
+        if (role === "cliente") {
           setTimeout(() => {
             router.push("/dashboard");
           }, 1000);
-        } else if (data.role === "vendedor") {
-          // Cambiado de "trabajador" a "vendedor"
+        } else if (role === "vendedor") {
           setTimeout(() => {
             router.push("/pos");
           }, 1000);
