@@ -45,12 +45,12 @@ export default function Home() {
         throw new Error("Token no encontrado en localStorage");
       }
 
-      const response = await fetch('http://localhost:3001/api/feedback', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/feedback`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          Authorization: `Bearer ${token}`, // Incluye el token en el encabezado
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           rating: Number(rating),
