@@ -12,6 +12,7 @@ type Producto = {
   descripcion: string;
   categoria: string;
   restaurante: string;
+  stock?: number; // <-- Agregado
 };
 
 type Categoria = {
@@ -175,6 +176,9 @@ function ProductContent() {
                         </span>
                         <p className="text-sm text-black mt-2">
                           {producto.descripcion}
+                        </p>
+                        <p className="text-sm text-blue-700 mt-2">
+                          Stock: {producto.stock ?? 0}
                         </p>
                       </div>
                       <button

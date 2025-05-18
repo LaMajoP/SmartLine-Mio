@@ -191,7 +191,7 @@ export default function Home() {
         </div>
 
         {/* Columna derecha con la imagen, ahora ocupa el 40% del espacio */}
-        <div className="md:col-span-2 flex items-center justify-center overflow-hidden">
+        <div className="hidden md:flex md:col-span-2 items-center justify-center overflow-hidden">
           <img
             src="https://solicitudesgh.unisabana.edu.co/assets/global/images/background/e0ca904fca686415370cbee0f135183a.jpg"
             alt="Campus"

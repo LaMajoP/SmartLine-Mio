@@ -1,20 +1,24 @@
 import { FC } from "react";
 import Link from "next/link";
 
-const NavigationMenuComponent: FC = () => {
+interface NavigationMenuProps {
+  onNavigate?: () => void;
+}
+
+const NavigationMenuComponent: FC<NavigationMenuProps> = ({ onNavigate }) => {
   return (
-    <section>
-      <Link href="/products">
-        <button className="px-16 rounded-sm font-semibold text-[85%] cursor-pointer">
+    <nav className="flex flex-col md:flex-row gap-4 md:gap-8">
+      <Link href="/products" onClick={onNavigate}>
+        <button className="px-6 py-2 rounded font-semibold text-[90%] cursor-pointer w-full md:w-auto text-left md:text-center">
           Productos
         </button>
       </Link>
-      <Link href="/restaurants">
-        <button className="px-16 rounded-sm font-semibold text-[85%] cursor-pointer">
+      <Link href="/restaurants" onClick={onNavigate}>
+        <button className="px-6 py-2 rounded font-semibold text-[90%] cursor-pointer w-full md:w-auto text-left md:text-center">
           Restaurantes
         </button>
       </Link>
-    </section>
+    </nav>
   );
 };
 
