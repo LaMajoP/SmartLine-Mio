@@ -32,6 +32,15 @@ export default function Header() {
   return (
     <header className="border-b border-gray-200 bg-white w-full px-2 py-2 md:px-8 md:py-4 shadow-sm sticky top-0 z-30">
       <nav className="flex items-center justify-between w-full max-w-screen-2xl mx-auto relative">
+        {/* Menú hamburguesa (móvil) */}
+        <button
+          className="md:hidden p-2 focus:outline-none"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Abrir menú"
+        >
+          <span className="text-2xl">☰</span>
+        </button>
+
         {/* Logo */}
         <div className="flex items-center gap-2 md:gap-4">
           <Image
@@ -50,19 +59,21 @@ export default function Header() {
           <NavigationMenuComponent />
         </div>
 
-        {/* Menú hamburguesa (móvil) */}
-        <button
-          className="md:hidden p-2 focus:outline-none"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Abrir menú"
-        >
-          <span className="text-2xl">☰</span>
-        </button>
-
         {/* Menú lateral móvil */}
         {menuOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 z-40 flex">
-            <div className="bg-white w-64 h-full shadow-lg p-6 flex flex-col gap-6">
+          <div className="fixed inset-0 z-40 flex">
+            {/* Fondo oscuro con transición */}
+            <div
+              className="absolute inset-0 bg-transparent transition-opacity duration-300"
+              onClick={() => setMenuOpen(false)}
+            />
+            {/* Menú lateral con transición */}
+            <div
+              className="relative bg-white w-64 h-full shadow-lg p-6 flex flex-col gap-6
+              transform transition-transform duration-300 ease-in-out
+              translate-x-0"
+              style={{ left: 0 }}
+            >
               <button
                 className="self-end text-2xl mb-4"
                 onClick={() => setMenuOpen(false)}
@@ -72,6 +83,7 @@ export default function Header() {
               </button>
               <NavigationMenuComponent onNavigate={() => setMenuOpen(false)} />
             </div>
+            {/* Espacio para cerrar menú al hacer clic fuera */}
             <div className="flex-1" onClick={() => setMenuOpen(false)} />
           </div>
         )}
