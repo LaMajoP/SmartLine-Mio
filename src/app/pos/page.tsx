@@ -2,12 +2,13 @@
 import React, { useState, useEffect } from "react";
 import Inventario from "@/app/pos/inventory";
 import Ventas from "@/app/pos/sale";
+import Feedback from "@/app/pos/feedback";
 import Image from "next/image";
 import SmartLine_Logo from "@/assets/SmartLine_Logo.webp";
 import { useRouter } from "next/navigation";
 
 export default function POSPage() {
-  const [view, setView] = useState<"inventario" | "vender" | null>(null);
+const [view, setView] = useState<"inventario" | "vender" | "feedback" | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -22,16 +23,18 @@ export default function POSPage() {
     router.push("/login");
   };
 
-  const renderContent = () => {
-    switch (view) {
-      case "inventario":
-        return <Inventario />;
-      case "vender":
-        return <Ventas />;
-      default:
-        return <p className="mt-6 text-gray-700 text-center">Selecciona una opción</p>;
-    }
-  };
+const renderContent = () => {
+  switch (view) {
+    case "inventario":
+      return <Inventario />;
+    case "vender":
+      return <Ventas />;
+    case "feedback":
+      return <Feedback />;
+    default:
+      return <p className="mt-6 text-gray-700 text-center">Selecciona una opción</p>;
+  }
+};
 
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col">
@@ -68,6 +71,17 @@ export default function POSPage() {
         >
           Vender
         </button>
+<button
+  className={`p-3 px-6 text-lg font-medium rounded-md border transition duration-300 ${
+    view === "feedback"
+      ? "border-purple-500 text-purple-500 bg-purple-50"
+      : "border-gray-300 text-gray-700 hover:bg-gray-100"
+  }`}
+  onClick={() => setView("feedback")}
+>
+  Feedback
+</button>
+
       </div>
 
       {/* Contenido dinámico */}
