@@ -37,7 +37,16 @@ function ProductContent() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/inventario-completo`);
+      const token = localStorage.getItem("token"); // Obtener el token del localStorage
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/inventory/inventario-completo`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+
       if (!res.ok) {
         throw new Error(`Error ${res.status}: ${res.statusText}`);
       }

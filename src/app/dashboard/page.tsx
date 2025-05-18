@@ -1,5 +1,5 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/app/components/header";
 import { useRouter } from "next/navigation";
 import HistorialCompras from "@/app/components/HistorialCompras"; // <-- Importa el componente real
@@ -10,6 +10,19 @@ export default function Home() {
   const [feedback, setFeedback] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitMessage, setSubmitMessage] = useState<string>("");
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    if (!token || role !== "cliente") {
+      router.push("/login");
+    } else {
+      setAuthChecked(true);
+    }
+  }, []);
+
+  if (!authChecked) return null;
 
   // Función para manejar el envío del feedback
   const handleSubmitFeedback = async () => {
@@ -22,22 +35,26 @@ export default function Home() {
     try {
       console.log('Enviando feedback:', {
         rating,
-        comment: feedback,
-        restaurant: "Arcos",
-        userId: "abc123kfIduXZ80p"
+        message: feedback
       });
+
+      const token = localStorage.getItem("token"); // Obtén el token de autenticación
+      console.log('Token obtenido de localStorage:', token); // Verifica si el token está disponible
+
+      if (!token) {
+        throw new Error("Token no encontrado en localStorage");
+      }
 
       const response = await fetch('http://localhost:3001/api/feedback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          Authorization: `Bearer ${token}`, // Incluye el token en el encabezado
         },
         body: JSON.stringify({
           rating: Number(rating),
-          comment: feedback,
-          restaurant: "Arcos",
-          userId: "abc123kfIduXZ80p"
+          message: feedback
         })
       });
 
