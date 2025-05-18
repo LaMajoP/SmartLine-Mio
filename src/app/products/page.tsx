@@ -158,32 +158,32 @@ function ProductContent() {
 
             {restaurante.categorias.map((categoria, categoriaIndex) => (
               <div key={`${restaurante.nombreRestaurante}-${categoria.nombre}-${categoriaIndex}`} className="mt-6">
-                <h3 className="text-2xl font-semibold text-blue-600 mb-4">
+                <h3 className="text-xl sm:text-2xl font-semibold text-blue-600 mb-4">
                   {categoria.nombre}
                 </h3>
-                <div className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {categoria.productos.map((producto, productoIndex) => (
                     <div
                       key={`${categoria.nombre}-${producto.nombre}-${productoIndex}`}
-                      className="flex justify-between items-center p-6 rounded-lg shadow-lg transform hover:scale-[101%] transition-transform duration-300"
+                      className="flex flex-col justify-between h-full p-4 sm:p-6 rounded-lg shadow-lg bg-white transform hover:scale-[101%] transition-transform duration-300"
                     >
-                      <div className="max-w-[70%]">
-                        <strong className="text-2xl font-semibold text-green-600">
+                      <div>
+                        <strong className="text-lg sm:text-2xl font-semibold text-green-600 block">
                           {producto.nombre}
                         </strong>
-                        <span className="block text-lg font-medium text-black mt-2">
+                        <span className="block text-base sm:text-lg font-medium text-black mt-2">
                           ${producto.precio}
                         </span>
-                        <p className="text-sm text-black mt-2">
+                        <p className="text-xs sm:text-sm text-black mt-2">
                           {producto.descripcion}
                         </p>
-                        <p className="text-sm text-blue-700 mt-2">
+                        <p className="text-xs sm:text-sm text-blue-700 mt-2">
                           Stock: {producto.stock ?? 0}
                         </p>
                       </div>
                       <button
                         onClick={() => handleAddItem(producto)}
-                        className="bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition duration-300 transform hover:scale-[102%] cursor-pointer"
+                        className="mt-4 bg-green-600 text-white py-2 sm:py-3 px-4 sm:px-6 rounded-lg font-semibold hover:bg-green-700 transition duration-300 transform hover:scale-[102%] cursor-pointer"
                       >
                         Añadir al carrito
                       </button>

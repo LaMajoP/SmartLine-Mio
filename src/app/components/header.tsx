@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Search } from "lucide-react";
+import { Search, LogOut } from "lucide-react";
 import SmartLine_Logo from "@/assets/SmartLine_Logo.webp";
 import NavigationMenuComponent from "@/app/components/navigationMenu";
 import { useRouter } from "next/navigation";
@@ -46,9 +46,7 @@ export default function Header() {
           <Image
             src={SmartLine_Logo}
             alt="SmartLine Logo"
-            width={130}
-            height={40}
-            className="cursor-pointer h-auto w-auto"
+            className="cursor-pointer h-auto w-24 sm:w-32 md:w-40 min-w-[10rem] flex-shrink-0"
             onClick={() => router.push("/dashboard")}
             priority
           />
@@ -89,10 +87,10 @@ export default function Header() {
         )}
 
         {/* Barra de búsqueda y menús de usuario/carrito */}
-        <div className="flex items-center gap-2 md:gap-6 flex-1 justify-end">
+        <div className="flex items-center gap-2 md:gap-6 justify-end w-auto">
           <form
             onSubmit={handleSearchSubmit}
-            className="flex items-center border-1 border-gray-300 rounded-full overflow-hidden bg-gray-100 w-32 sm:w-44 md:w-96 shadow focus-within:ring-2 focus-within:ring-blue-300 transition-all"
+            className="flex items-center border-1 border-gray-300 rounded-full overflow-hidden bg-gray-100 w-full max-w-[140px] sm:max-w-[180px] md:max-w-md shadow focus-within:ring-2 focus-within:ring-blue-300 transition-all"
           >
             <input
               type="text"
@@ -109,12 +107,22 @@ export default function Header() {
               <Search className="w-5 h-5" />
             </button>
           </form>
-          <div>
+          <div className="shrink-0">
             <CartDropdownMenu />
           </div>
+          {/* Icono solo en móvil/tablet */}
           <button
             onClick={handleLogout}
-            className="bg-red-500 cursor-pointer hover:bg-red-600 text-white px-4 py-2 rounded-2xl font-semibold transition"
+            className="lg:hidden p-2 shrink-0"
+            aria-label="Cerrar sesión"
+            title="Cerrar sesión"
+          >
+            <LogOut className="w-6 h-6 text-red-500" />
+          </button>
+          {/* Botón solo en desktop grande */}
+          <button
+            onClick={handleLogout}
+            className="hidden lg:inline-flex bg-red-500 cursor-pointer hover:bg-red-600 text-white px-4 py-2 rounded-2xl font-semibold transition shrink-0"
           >
             Cerrar sesión
           </button>
