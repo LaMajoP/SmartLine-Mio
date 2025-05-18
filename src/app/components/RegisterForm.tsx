@@ -39,17 +39,21 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
         const data = await res.json();
         setError(data.message || "Error al registrar usuario");
       } else {
+        const data = await res.json();
+        // Guardar token y rol en localStorage
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.user.role?.toLowerCase());
         setSuccess("¡Registro exitoso!");
         setForm({ email: "", password: "", role: "" });
         setTimeout(() => {
           if (onSuccess) {
             onSuccess();
           }
-          // Redirige según el rol
-          if (form.role === "vendedor") {
-            router.push("/pos"); // Redirige a la página de POS
+          // Redirigir según el rol
+          if (data.user.role === "vendedor") {
+            router.push("/pos");
           } else {
-            router.push("/dashboard"); // Redirige al dashboard
+            router.push("/dashboard");
           }
         }, 1000);
       }
