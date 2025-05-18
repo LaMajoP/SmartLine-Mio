@@ -43,6 +43,9 @@ export default function RegisterForm({ onSuccess }: { onSuccess?: () => void }) 
         // Guardar token y rol en localStorage
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", data.user.role?.toLowerCase());
+        localStorage.setItem("userId", data.user.userId);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
         setSuccess("¡Registro exitoso!");
         setForm({ email: "", password: "", role: "" });
         setTimeout(() => {
