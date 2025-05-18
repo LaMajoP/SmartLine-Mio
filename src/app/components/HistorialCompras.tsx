@@ -27,14 +27,17 @@ export default function HistorialCompras() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cambia este valor por el userId real del usuario autenticado
-  const userId = "TU_USER_ID_AQUI"; // Reemplaza por el userId real del usuario autenticado
-
   const fetchHistorial = async () => {
     setIsLoading(true);
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/historial?userId=${userId}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/orders/historial`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
       if (!res.ok) {
         throw new Error(`Error ${res.status}: ${res.statusText}`);
