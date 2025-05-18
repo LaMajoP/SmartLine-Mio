@@ -1,8 +1,8 @@
-'use client';
+"use client";
 import { useState, useEffect } from "react";
 import Header from "@/app/components/header";
+import HistorialCompras from "@/app/components/HistorialCompras";
 import { useRouter } from "next/navigation";
-import HistorialCompras from "@/app/components/HistorialCompras"; // <-- Importa el componente real
 
 export default function Home() {
   const router = useRouter();
@@ -187,7 +187,7 @@ export default function Home() {
           </section>
 
           {/* Historial de Compras */}
-          <HistorialCompras /> {/* <-- Aquí va el historial real */}
+          <HistorialCompras /> 
         </div>
 
         {/* Columna derecha con la imagen, ahora ocupa el 40% del espacio */}

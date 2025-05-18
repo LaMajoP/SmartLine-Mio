@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import RegisterForm from "@/app/components/RegisterForm";
 import Header from "@/app/components/header";
 import { useState } from "react";

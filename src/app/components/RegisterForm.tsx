@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import SmartLine_Logo from "@/assets/SmartLine_Logo.webp";
 import { useState } from "react";
 import { useRouter } from "next/navigation";

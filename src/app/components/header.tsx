@@ -22,7 +22,9 @@ export default function Header() {
   };
 
   const handleLogout = () => {
-    // Aquí puedes agregar tu lógica de logout
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("user");
     router.push("/login");
   };
 

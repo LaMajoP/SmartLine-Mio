@@ -29,12 +29,12 @@ export default function HistorialCompras() {
   const [userId, setUserId] = useState<string>("");
   const [userLoaded, setUserLoaded] = useState(false);
 
-  // Obtener userId desde localStorage
+  // Obtener userId desde localStorage SOLO del usuario actual
   useEffect(() => {
     if (typeof window !== "undefined") {
       try {
         const user = JSON.parse(localStorage.getItem("user") || "{}");
-        setUserId(user.userId || "");
+        setUserId(user.userId || user.id || ""); // Asegúrate de que el campo sea correcto
       } catch {
         setUserId("");
       }
@@ -59,7 +59,6 @@ export default function HistorialCompras() {
         throw new Error(`Error ${res.status}: ${res.statusText}`);
       }
       const data = await res.json();
-      console.log("Historial recibido:", data); // <-- Agrega esta línea
       setDatos(data);
       setError(null);
     } catch (err) {
@@ -101,6 +100,11 @@ export default function HistorialCompras() {
     })
     .filter((restaurante) => restaurante !== null) as Restaurante[];
 
+  // Evita renderizar hasta que el user esté cargado en el cliente
+  if (typeof window === "undefined" || !userLoaded) {
+    return null;
+  }
+
   return (
     <section className="bg-white p-6 rounded-2xl shadow-xl col-span-2">
       <h2 className="font-semibold text-2xl mb-6 text-gray-800">
@@ -141,6 +145,11 @@ export default function HistorialCompras() {
                   <p className="text-gray-500 text-sm">{producto.precio ? `$${producto.precio}` : ""}</p>
                   <p className="text-gray-500 text-sm">{producto.descripcion}</p>
                   <p className="text-xs text-gray-400">{categoria.nombre} - {restaurante.nombreRestaurante}</p>
+                  {producto.fechaCompra && (
+                    <p className="text-xs text-gray-400">
+                      Fecha: {new Date(producto.fechaCompra).toLocaleString()}
+                    </p>
+                  )}
                 </div>
               </div>
             ))
